@@ -86,7 +86,8 @@ if __name__ == "__main__":
                 discovered_ips.append(inet_ntoa(item.sin_addr.pack()))
 
     for ip_address in discovered_ips:
-        # EIS opens a session for each service request and closes that session after receiving the response to that service.
+        # Our BasicScanner opens a session for each service request and closes that session
+        # after receiving the response to that service.
         # It's not possible to use a same session for a sequence of services.
         print(f"*** Server {ip_address} ***")
         print("get_attribute_single returns CIP data in bytes format:")

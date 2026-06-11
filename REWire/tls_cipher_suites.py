@@ -1,4 +1,4 @@
-from REWire.rw_enums import Enum_
+from REWire.rw_enums import EnumThatWorks
 
 __all__ = [
     'TLS_NULL_WITH_NULL_NULL',
@@ -798,7 +798,7 @@ OpenSSL_cipher_mapping = {
 
 }
 
-class OpenSSL_cipher_mapping__(Enum_):
+class OpenSSL_cipher_mapping__(EnumThatWorks):
     TLS_ECDHE_ECDSA_WITH_NULL_SHA                 = 'ECDHE-ECDSA-NULL-SHA'                    # 0xC0,0x06 - TLSv1   Kx=ECDH     Au=ECDSA Enc=None                   Mac=SHA1
     TLS_ECDHE_RSA_WITH_NULL_SHA                   = 'ECDHE-RSA-NULL-SHA'                      # 0xC0,0x10 - TLSv1   Kx=ECDH     Au=RSA   Enc=None                   Mac=SHA1
     TLS_ECDH_anon_WITH_NULL_SHA                   = 'AECDH-NULL-SHA'                          # 0xC0,0x15 - TLSv1   Kx=ECDH     Au=None  Enc=None                   Mac=SHA1
@@ -1068,7 +1068,7 @@ class OpenSSL_CipherSuites():
     CAMELLIA128_SHA                = 0x00,0x41 # SSLv3   Kx=RSA      Au=RSA   Enc=Camellia(128)          Mac=SHA1
     TLS_ECDHE_PSK_WITH_NULL_SHA256 = 0xC0,0x3A
 
-class TLS_CIPHER_SUITES(Enum_):
+class TLS_CIPHER_SUITES(EnumThatWorks):
     TLS_NULL_WITH_NULL_NULL                     = 0x0000
     TLS_RSA_WITH_NULL_MD5                       = 0x0001
     TLS_RSA_WITH_NULL_SHA                       = 0x0002

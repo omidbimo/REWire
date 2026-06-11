@@ -73,13 +73,13 @@ class CIP_ObjectCommon(metaclass = CIP_ObjectMeta):
             logger.warning('Unable to find the data type of class:0x{:X}, instance:{}, attribute:{}'.format(
                 self.class_id, instance_id, attribute_id))
 
-        rsp = self.client.cip_service(CIP_Services.GET_ATTRIBUTE_SINGLE,
+        rsp = self.client.cip_service(CIPServiceId.GET_ATTRIBUTE_SINGLE,
                 self.class_id, instance_id, attribute_id, rsp_dt=rsp_dt)
 
         return rsp
 
     def set_attribute_single(self, instance_id, attribute_id, data):
-        rsp = self.client.cip_service(CIP_Services.SET_ATTRIBUTE_SINGLE,
+        rsp = self.client.cip_service(CIPServiceId.SET_ATTRIBUTE_SINGLE,
                 self.class_id, instance_id, attribute_id, data=data)
 
 

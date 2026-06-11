@@ -3,8 +3,8 @@ from REWire.cip_types import *
 from REWire.utils import *
 
 from REWire.common import (
-    CIP_Services as CIP_Services,
-    CIPObjectId as CIPObjectId,
+    CIPServiceId,
+    CIPObjectId,
     )
 
 from REWire.exceptions import (
@@ -52,23 +52,23 @@ class ExplicitTransport:
     def get_attributes_all(self, class_id, instance_id,
             ekey: ELECTRONIC_KEY_SEGMENT=None, rsp_dt=None):
 
-        return self.cip_service(CIP_Services.GET_ATTRIBUTES_ALL,
+        return self.cip_service(CIPServiceId.GET_ATTRIBUTES_ALL,
                 class_id, instance_id, ekey=ekey, rsp_dt=rsp_dt)
 
     def get_attribute_single(self, class_id, instance_id, attribute_id,
             ekey: ELECTRONIC_KEY_SEGMENT=None, rsp_dt=None):
 
-        return self.cip_service(CIP_Services.GET_ATTRIBUTE_SINGLE,
+        return self.cip_service(CIPServiceId.GET_ATTRIBUTE_SINGLE,
                 class_id, instance_id, attribute_id, ekey=ekey, rsp_dt=rsp_dt)
 
     def set_attribute_single(self, class_id, instance_id, attribute_id,
             ekey: ELECTRONIC_KEY_SEGMENT=None, data=BYTES()):
-        self.cip_service(CIP_Services.SET_ATTRIBUTE_SINGLE, class_id,
+        self.cip_service(CIPServiceId.SET_ATTRIBUTE_SINGLE, class_id,
             instance_id, attribute_id, ekey=ekey, data=data)
 
     def reset(self, class_id, instance_id, ekey: ELECTRONIC_KEY_SEGMENT=None,
             data=BYTES()):
-        return self.cip_service(CIP_Services.RESET,
+        return self.cip_service(CIPServiceId.RESET,
                 class_id, instance_id, ekey=ekey, data=data)
 
     @property

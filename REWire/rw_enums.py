@@ -1,4 +1,4 @@
-class Enum_():
+class EnumThatWorks():
 
     def name(self, enum):
         for attr in vars(self.__class__):

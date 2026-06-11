@@ -1,12 +1,13 @@
-from enum import IntEnum
+
 from socket import inet_ntoa
 import logging
 log = logging.getLogger(__name__)
 
 from REWire.rw_packet import Packet
 from REWire.cip_types import *
+from REWire.rw_enums import EnumThatWorks
 
-class CPFId(IntEnum):
+class CPFId(EnumThatWorks):
     NULL_ADDRESS                = 0x0000
     CIP_IDENTITY                = 0x000C
     CIP_SECURITY_INFORMATION    = 0x0086
@@ -20,6 +21,7 @@ class CPFId(IntEnum):
     SOCKADDR_INFO_T2O           = 0x8001
     SEQUENCED_ADDRESS           = 0x8002
     DTLS_UNCONNECTED_MESSAGE    = 0x8003
+
 
 class SinZero(BYTES):
     def __init__(self, value):

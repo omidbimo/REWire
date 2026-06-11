@@ -1,15 +1,15 @@
 from REWire.rw_packet import Packet
 from REWire.cip_types import *
 from REWire.cip_object import *
-from REWire.common import CIP_class_attributes, Revision, CIP_Services
-from REWire.rw_enums import Enum_
+from REWire.common import CIP_class_attributes, Revision, CIPServiceId
+from REWire.rw_enums import EnumThatWorks
 
-class Status(Enum_):
+class Status(EnumThatWorks):
     NOT_VERIFIED = 0
     VERIFIED = 1
     INVALID = 2
 
-class Object0x005F_Services(CIP_Services):
+class Object0x005F_Services(CIPServiceId):
     CREATE_CSR = 0x4B
     VERIFY_CERTIFICATE = 0x4C
 

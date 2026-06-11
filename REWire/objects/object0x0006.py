@@ -2,12 +2,12 @@ from REWire.rw_packet import Packet
 from REWire.cip_types import *
 from REWire.cip_object import *
 from REWire.common     import *
-from REWire.rw_enums import Enum_
+from REWire.rw_enums import EnumThatWorks
 from REWire.objects.object0x0005 import TransportClassTrigger
 import logging
 logger = logging.getLogger(__name__)
 
-class Object0x0006_Services(CIP_Services):
+class Object0x0006_Services(CIPServiceId):
     FORWARD_CLOSE           = 0x4E
     UNCONNECTED_SEND        = 0x52
     FORWARD_OPEN            = 0x54
@@ -17,14 +17,14 @@ class Object0x0006_Services(CIP_Services):
     LARGE_FORWARD_OPEN      = 0x5B
 
 
-class Priority(Enum_):
+class Priority(EnumThatWorks):
     LOW       = 0
     HIGH      = 1
     SCHEDULED = 2
     URGENT    = 3
 
 
-class ConnectionType(Enum_):
+class ConnectionType(EnumThatWorks):
     NULL        = 0
     MULTICAST   = 1
     POINT2POINT = 2

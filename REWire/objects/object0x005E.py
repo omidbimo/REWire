@@ -1,15 +1,15 @@
 from REWire.cip_types import Packet
 from REWire.cip_types import *
 from REWire.cip_object import *
-from REWire.common import CIP_class_attributes, Revision, CIP_Services
-from REWire.rw_enums import Enum_
+from REWire.common import CIP_class_attributes, Revision, CIPServiceId
+from REWire.rw_enums import EnumThatWorks
 from REWire.tls_cipher_suites import *
 
 import string
 import random
 from os import urandom
 
-class State(Enum_):
+class State(EnumThatWorks):
     FACTORY_DEFAULT_CONFIGURATION = 0
     CONFIGURATION_IN_PROGRESS = 1
     CONFIGURED = 2
@@ -17,13 +17,13 @@ class State(Enum_):
     PULL_MODEL_COMPLETED = 4
     PULL_MODEL_DISABLED = 5
 
-class Object0x005E_Services(CIP_Services):
+class Object0x005E_Services(CIPServiceId):
     BEGIN_CONFIG = 0x4B
     KICK_TIMER = 0x4C
     APPLY_CONFIG = 0x4D
     ABORT_CONFIG = 0x4E
 
-class PSK_Usage(Enum_):
+class PSK_Usage(EnumThatWorks):
     SERVER = 0
     CLIENT = 1
     ANY_USAGE = 2

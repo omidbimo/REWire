@@ -2,10 +2,10 @@ from REWire.rw_packet import Packet
 from REWire.cip_types import *
 from REWire.cip_object import *
 from REWire.common     import *
-from REWire.rw_enums import Enum_
+from REWire.rw_enums import EnumThatWorks
 
 
-class Object0x0063_Services(CIP_Services):
+class Object0x0063_Services(CIPServiceId):
     SET_RULES = 0x4B
 
 

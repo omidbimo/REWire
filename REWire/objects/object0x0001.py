@@ -1,9 +1,9 @@
 from REWire.rw_packet import Packet
 from REWire.cip_types import *
 from REWire.cip_object import *
-from REWire.common     import CIP_class_attributes, Revision, CIP_Services
+from REWire.common import CIP_class_attributes, Revision, CIPServiceId
 
-class Object0x0001_Services(CIP_Services):
+class Object0x0001_Services(CIPServiceId):
     FLASH_LEDS = 0x4B
     CERTIFICATE_CHALLENGE = 0x4C
 

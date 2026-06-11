@@ -10,12 +10,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Object0x0002_Services(CIP_Services):
+class Object0x0002_Services(CIPServiceId):
     SYMBOLIC_TRANSLATION =  0x4B
     SEND_RECEIVE_FRAGMENT = 0x4C
 
 
-class FragmentationFlags(Enum_):
+class FragmentationFlags(EnumThatWorks):
     FIRST = 0x01
     LAST  = 0x02
     ABORT = 0x04

@@ -29,8 +29,8 @@ from REWire.objects.object0x0005 import (
     )
 
 from REWire.common import (
-    CIP_Services as CIP_Services,
-    CIPObjectId as CIPObjectId,
+    CIPServiceId,
+    CIPObjectId,
     )
 
 from REWire.exceptions import (

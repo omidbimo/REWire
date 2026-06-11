@@ -1,7 +1,7 @@
-from REWire.rw_enums import Enum_
+from REWire.rw_enums import EnumThatWorks
 from REWire.cip_types import *
 
-class EncapsulationStatus(Enum_):
+class EncapsulationStatus(EnumThatWorks):
     SUCCESS                      = 0x00
     INVALID_COMMAND              = 0x01
     INSUFFICIENT_MEMORY          = 0x02
@@ -11,7 +11,7 @@ class EncapsulationStatus(Enum_):
     UNSUPPORTED_PROTOCOL_VERSION = 0x69
     SERVICE_NOT_ALLOWED_FOR_PORT = 0x6A
 
-class CIP_GeneralStatusCodes(Enum_):
+class CIP_GeneralStatusCodes(EnumThatWorks):
     SUCCESS                                 = 0X00
     COMMUNICATIONS_RELATED_PROBLEM          = 0X01
     NO_RESOURCE                             = 0X02

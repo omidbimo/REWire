@@ -36,7 +36,7 @@ from REWire.objects.object0x0005 import (
 
 from REWire.common import (
     CIP_Services as CIP_Services,
-    CIP_Objects as CIP_Objects,
+    CIPObjectId as CIPObjectId,
     )
 
 from REWire.cip_objects import *
@@ -144,7 +144,7 @@ class ConnectedClient(ExplicitTransport):
         if self.ekey is not None:
             connection_path += self.ekey
         # fwd_open_req.connection_path has type of PaddedEPATH
-        connection_path += CLASS_ID_SEGMENT(CIP_Objects.MESSAGE_ROUTER)
+        connection_path += CLASS_ID_SEGMENT(CIPObjectId.MESSAGE_ROUTER)
         connection_path += INSTANCE_ID_SEGMENT(1)
 
         self.session.add_owner(self)

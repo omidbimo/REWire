@@ -4,7 +4,7 @@ from REWire.utils import *
 
 from REWire.common import (
     CIP_Services as CIP_Services,
-    CIP_Objects as CIP_Objects,
+    CIPObjectId as CIPObjectId,
     )
 
 from REWire.exceptions import (

@@ -1,8 +1,9 @@
+from enum import IntEnum
 from REWire.rw_packet import Packet
 from REWire.cip_types import *
 from REWire.rw_enums import Enum_
 
-class CIP_Objects(Enum_):
+class CIPObjectId(IntEnum):
     IDENTITY                    = 0X01
     MESSAGE_ROUTER              = 0X02
     DEVICENET                   = 0X03

@@ -216,7 +216,7 @@ class Object0x0006_Rev3(CIP_ObjectCommon):
             )
 
         cip_data = self.client.cip_service(self.services.FORWARD_OPEN,
-                    CIP_Objects.CONNECTION_MANAGER, instance_id = 1,
+                    CIPObjectId.CONNECTION_MANAGER, instance_id = 1,
                     data = fwd_open_req, timeout=5000)
 
         fwd_open_rsp = ForwardOpenResponse().unpack(cip_data)
@@ -273,11 +273,11 @@ class Object0x0006_Rev3(CIP_ObjectCommon):
                 )
 
         # fw_close_req.connection_path has type of PaddedEPATH
-        fw_close_req.connection_path += CLASS_ID_SEGMENT(CIP_Objects.MESSAGE_ROUTER)
+        fw_close_req.connection_path += CLASS_ID_SEGMENT(CIPObjectId.MESSAGE_ROUTER)
         fw_close_req.connection_path += INSTANCE_ID_SEGMENT(1)
 
         cip_data = self.client.cip_service(self.services.FORWARD_CLOSE,
-                CIP_Objects.CONNECTION_MANAGER,
+                CIPObjectId.CONNECTION_MANAGER,
                 instance_id = 1,
                 data = fw_close_req,
                 timeout=5000,)
@@ -333,7 +333,7 @@ class Object0x0006_Rev3(CIP_ObjectCommon):
             )
 
         cip_data = self.client.cip_service(self.services.LARGE_FORWARD_OPEN,
-                    CIP_Objects.CONNECTION_MANAGER, instance_id = 1,
+                    CIPObjectId.CONNECTION_MANAGER, instance_id = 1,
                     data = fwd_open_req, timeout=5000)
 
         fwd_open_rsp = ForwardOpenResponse().unpack(cip_data)

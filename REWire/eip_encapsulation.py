@@ -9,7 +9,7 @@ from REWire.rw_enums import Enum_
 from REWire.rw_packet import Packet
 from REWire.cip_types import *
 from REWire.rw_sockets import RWSocket, RW_TCPSocket, RW_TLSSocket, TCP, UDP
-from REWire.common_packet_format import CPF
+from REWire.common_packet_format import CPFId, CPF
 from REWire.exceptions import EncapsulationStatus, EncapsulationError
 from REWire.rw_watchdog import WatchdogTimer
 
@@ -394,7 +394,7 @@ def list_services_unpack_response(rsp_data, time_ref):
             logger.warning("Unexpected number of items ({}) in List Services response.".format(len(cpf)))
 
         for item in cpf:
-            if item.type_id == cpf.TYPE_ID_LIST_SERVICES:
+            if item.type_id == CPFId.LIST_SERVICES:
                 services.append((item, sender_addr, timestamp - time_ref))
                 continue
 
@@ -445,10 +445,10 @@ def list_identity_unpack_response(rsp_data, time_ref):
 
         identity_items = []
         for item in cpf:
-            if (item.type_id == cpf.TYPE_ID_CIP_IDENTITY or
-                item.type_id == cpf.TYPE_ID_CIP_SECURITY_INFORMATION or
-                item.type_id == cpf.TYPE_ID_ETHERNETIP_CAPABILITY or
-                item.type_id == cpf.TYPE_ID_ETHERNETIP_USAGE):
+            if (item.type_id == CPFId.CIP_IDENTITY or
+                item.type_id == CPFId.CIP_SECURITY_INFORMATION or
+                item.type_id == CPFId.ETHERNETIP_CAPABILITY or
+                item.type_id == CPFId.ETHERNETIP_USAGE):
 
                 identity_items.append(item)
                 continue

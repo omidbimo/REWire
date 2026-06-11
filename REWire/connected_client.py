@@ -9,7 +9,8 @@ import REWire.eip_encapsulation as eip_encap
 from REWire.rw_packet import Packet
 from REWire.rw_watchdog import WatchdogTimer
 from REWire.common_packet_format import (
-    CPF as cpf,
+    CPF,
+    CPFId,
     ConnectedAddressItem,
     ConnectedDataItem,
     )
@@ -267,11 +268,11 @@ class ConnectedClient(ExplicitTransport):
                  self.session.seq_number, timeout)
         class3_rsp = Class2_3_Packet.unpack(rsp)
 
-        if class3_rsp.data_item.type_id != cpf.TYPE_ID_CONNECTED_DATA:
+        if class3_rsp.data_item.type_id != CPFId.CONNECTED_DATA:
             raise Exception(
                 "Unexpected CPF in SendUnitData response! " +
                 "expected:{}, got:{}".format(
-                    cpf.TYPE_ID_CONNECTED_DATA,
+                    CPFId.CONNECTED_DATA,
                     class3_rsp.data_item.type_id
                     )
                 )

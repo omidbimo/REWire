@@ -6,7 +6,7 @@ import logging
 import REWire.eip_encapsulation as eip_encap
 from REWire.rw_packet import Packet
 from REWire.common_packet_format import (
-        CPF as cpf,
+        CPFId,
         NullAddressItem,
         UnconnectedDataItem,
         )
@@ -58,7 +58,7 @@ class UCMMResponse(UCMMRequest):
 class DTLS_UnconnectedEncapPacket(Packet):
     _fields = (
         ('item_count', UINT(1)),
-        ('type_id', UINT(cpf.TYPE_ID_DTLS_UNCONNECTED_MESSAGE)),
+        ('type_id', UINT(CPFId.DTLS_UNCONNECTED_MESSAGE)),
         ('length', UINT(10)),
         ('unconn_msg_type', UINT(1)),
         ('transaction_number', UDINT(0)),
@@ -122,9 +122,9 @@ class UnconnectedClient(ExplicitTransport):
 
         ucmm_rsp = UCMMResponse.unpack(rsp)
 
-        if ucmm_rsp.data_item.type_id != cpf.TYPE_ID_UNCONNECTED_DATA:
+        if ucmm_rsp.data_item.type_id != CPFId.UNCONNECTED_DATA:
             raise Exception("Unexpected CPF in SendRRData response! " +
-                "expected:{}, got:{}".format(cpf.TYPE_ID_UNCONNECTED_DATA, ucmm_rsp.data_item.type_id))
+                "expected:{}, got:{}".format(CPFId.UNCONNECTED_DATA, ucmm_rsp.data_item.type_id))
 
         if ucmm_rsp.data_item.length != len(ucmm_rsp.data_item.data):
             raise Exception("Unexpected data length in Unconnected message! " +
@@ -188,12 +188,12 @@ class DTLS_Client(ExplicitTransport):
             timeout = timeout - (time() - t_start)
             dtls_ucm = DTLS_UnconnectedEncapPacket.unpack(data)
 
-            if dtls_ucm.type_id == cpf.TYPE_ID_SEQUENCED_ADDRESS:
+            if dtls_ucm.type_id == CPFId.SEQUENCED_ADDRESS:
                 #TODO: callback for IO packets
                 continue
-            if dtls_ucm.type_id != cpf.TYPE_ID_DTLS_UNCONNECTED_MESSAGE:
+            if dtls_ucm.type_id != CPFId.DTLS_UNCONNECTED_MESSAGE:
                 raise Exception("Unexpected CPF in DTLS response! " +
-                    "expected:{}, got:{}".format(cpf.TYPE_ID_DTLS_UNCONNECTED_MESSAGE, dtls_ucm.type_id))
+                    "expected:{}, got:{}".format(CPFId.DTLS_UNCONNECTED_MESSAGE, dtls_ucm.type_id))
 
             if dtls_ucm.length != len(dtls_ucm.unconn_msg_type) + len(dtls_ucm.transaction_number) + len(dtls_ucm.status) + len(dtls_ucm.unconnected_message):
                 raise Exception("Unexpected data length in Unconnected message! " +

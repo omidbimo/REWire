@@ -1,9 +1,25 @@
-from REWire.rw_packet import Packet
-from REWire.cip_types import *
-
+from enum import IntEnum
 from socket import inet_ntoa
 import logging
 log = logging.getLogger(__name__)
+
+from REWire.rw_packet import Packet
+from REWire.cip_types import *
+
+class CPFId(IntEnum):
+    NULL_ADDRESS                = 0x0000
+    CIP_IDENTITY                = 0x000C
+    CIP_SECURITY_INFORMATION    = 0x0086
+    ETHERNETIP_CAPABILITY       = 0x0087
+    ETHERNETIP_USAGE            = 0x0088
+    CONNECTED_ADDRESS           = 0x00A1
+    CONNECTED_DATA              = 0x00B1
+    UNCONNECTED_DATA            = 0x00B2
+    LIST_SERVICES               = 0x0100
+    SOCKADDR_INFO_O2T           = 0x8000
+    SOCKADDR_INFO_T2O           = 0x8001
+    SEQUENCED_ADDRESS           = 0x8002
+    DTLS_UNCONNECTED_MESSAGE    = 0x8003
 
 class SinZero(BYTES):
     def __init__(self, value):
@@ -33,31 +49,31 @@ class CPF_Item(Packet):
         type_id, _ = UINT.dissect(bstream) # Do not update bstream
         item_type = None
 
-        if type_id == CPF.TYPE_ID_NULL_ADDRESS:
+        if type_id == CPFId.NULL_ADDRESS:
             item_type = NullAddressItem
-        elif type_id == CPF.TYPE_ID_CIP_IDENTITY:
+        elif type_id == CPFId.CIP_IDENTITY:
             item_type = CIPIdentityItem
-        elif type_id == CPF.TYPE_ID_CIP_SECURITY_INFORMATION:
+        elif type_id == CPFId.CIP_SECURITY_INFORMATION:
             item_type = CIPSecurityItem
-        elif type_id == CPF.TYPE_ID_ETHERNETIP_CAPABILITY:
+        elif type_id == CPFId.ETHERNETIP_CAPABILITY:
             item_type = EtherNetIPCapabilityItem
-        elif type_id == CPF.TYPE_ID_ETHERNETIP_USAGE:
+        elif type_id == CPFId.ETHERNETIP_USAGE:
             item_type = EtherNetIPUsageItem
-        elif type_id == CPF.TYPE_ID_CONNECTED_ADDRESS:
+        elif type_id == CPFId.CONNECTED_ADDRESS:
             item_type = ConnectedAddressItem
-        elif type_id == CPF.TYPE_ID_CONNECTED_DATA:
+        elif type_id == CPFId.CONNECTED_DATA:
             item_type = ConnectedDataItem
-        elif type_id == CPF.TYPE_ID_UNCONNECTED_DATA:
+        elif type_id == CPFId.UNCONNECTED_DATA:
             item_type = UnconnectedDataItem
-        elif type_id == CPF.TYPE_ID_LIST_SERVICES:
+        elif type_id == CPFId.LIST_SERVICES:
             item_type = ListServicesItem
-        elif type_id == CPF.TYPE_ID_SOCKADDR_INFO_O2T:
+        elif type_id == CPFId.SOCKADDR_INFO_O2T:
             item_type = SockaddrInfoItem
-        elif type_id == CPF.TYPE_ID_SOCKADDR_INFO_T2O:
+        elif type_id == CPFId.SOCKADDR_INFO_T2O:
             item_type = SockaddrInfoItem
-        elif type_id == CPF.TYPE_ID_SEQUENCED_ADDRESS:
+        elif type_id == CPFId.SEQUENCED_ADDRESS:
             item_type = SequencedAddressItem
-        elif type_id == CPF.TYPE_ID_DTLS_UNCONNECTED_MESSAGE:
+        elif type_id == CPFId.DTLS_UNCONNECTED_MESSAGE:
             item_type = DTLS_UnconnectedMessageItem
         else:
             raise Exception(f"Unknown CPF item: 0x{type_id:X}")
@@ -68,19 +84,6 @@ class CPF_Item(Packet):
 
 
 class CPF(ARRAY):
-    TYPE_ID_NULL_ADDRESS                = 0x0000
-    TYPE_ID_CIP_IDENTITY                = 0x000C
-    TYPE_ID_CIP_SECURITY_INFORMATION    = 0x0086
-    TYPE_ID_ETHERNETIP_CAPABILITY       = 0x0087
-    TYPE_ID_ETHERNETIP_USAGE            = 0x0088
-    TYPE_ID_CONNECTED_ADDRESS           = 0x00A1
-    TYPE_ID_CONNECTED_DATA              = 0x00B1
-    TYPE_ID_UNCONNECTED_DATA            = 0x00B2
-    TYPE_ID_LIST_SERVICES               = 0x0100
-    TYPE_ID_SOCKADDR_INFO_O2T           = 0x8000
-    TYPE_ID_SOCKADDR_INFO_T2O           = 0x8001
-    TYPE_ID_SEQUENCED_ADDRESS           = 0x8002
-    TYPE_ID_DTLS_UNCONNECTED_MESSAGE    = 0x8003
 
     def __init__(self, items=None):
         items = items or []
@@ -101,14 +104,14 @@ class CPF(ARRAY):
 
 class NullAddressItem(CPF_Item):
     _fields = (
-        ('type_id', UINT(CPF.TYPE_ID_NULL_ADDRESS)),
+        ('type_id', UINT(CPFId.NULL_ADDRESS)),
         ('length',  UINT(0)),
         )
 
 
 class ConnectedAddressItem(CPF_Item):
     _fields = (
-        ('type_id', UINT(CPF.TYPE_ID_CONNECTED_ADDRESS)),
+        ('type_id', UINT(CPFId.CONNECTED_ADDRESS)),
         ('length', UINT(4)),
         ('connection_identifier', UDINT(0)),
         )
@@ -116,7 +119,7 @@ class ConnectedAddressItem(CPF_Item):
 
 class SequencedAddressItem(CPF_Item):
     _fields = (
-        ('type_id', UINT(CPF.TYPE_ID_SEQUENCED_ADDRESS)),
+        ('type_id', UINT(CPFId.SEQUENCED_ADDRESS)),
         ('length', UINT(0)),
         ('connection_identifier', UDINT(0)),
         ('encapsulation_sequence_number', UDINT(0)),
@@ -125,7 +128,7 @@ class SequencedAddressItem(CPF_Item):
 
 class UnconnectedDataItem(CPF_Item):
     _fields = (
-        ('type_id', UINT(CPF.TYPE_ID_UNCONNECTED_DATA)),
+        ('type_id', UINT(CPFId.UNCONNECTED_DATA)),
         ('length', UINT(0)),
         ('data', BYTES()),
         )
@@ -136,7 +139,7 @@ class UnconnectedDataItem(CPF_Item):
 
 class ConnectedDataItem(CPF_Item):
     _fields = (
-        ('type_id', UINT(CPF.TYPE_ID_CONNECTED_DATA)),
+        ('type_id', UINT(CPFId.CONNECTED_DATA)),
         ('length', UINT(0)),
         ('data', BYTES()),
         )
@@ -147,7 +150,7 @@ class ConnectedDataItem(CPF_Item):
 
 class ListServicesItem(CPF_Item):
     _fields = (
-        ('type_id', UINT(CPF.TYPE_ID_LIST_SERVICES)),
+        ('type_id', UINT(CPFId.LIST_SERVICES)),
         ('length', UINT(0)),
         ('protocol_version', UINT(0)),
         ('capability_flags', UINT(0)),
@@ -181,7 +184,7 @@ class SockaddrInfoItem(CPF_Item):
 
 class CIPIdentityItem(CPF_Item):
     _fields = (
-        ('type_id', UINT(CPF.TYPE_ID_CIP_IDENTITY)),
+        ('type_id', UINT(CPFId.CIP_IDENTITY)),
         ('length', UINT(0)),
         ('encapsulation_protocol_version', UINT(0)),
         ('sin_family', INT(0)),
@@ -218,14 +221,14 @@ class CIPIdentityItem(CPF_Item):
 
 class CIPSecurityItem(CPF_Item):
     _fields = (
-                ('type_id',                     UINT(CPF.TYPE_ID_CIP_SECURITY_INFORMATION)),
-                ('length',                      UINT(0)),
-                ('security_profiles',           WORD(0)),
-                ('cip_security_state',          USINT(0)),
-                ('ethernetip_security_state',   USINT(0)),
-                ('iana_port_state',             BYTE(0)),
-                ('security_profile_configured', WORD(0)),
-                )
+        ('type_id',                     UINT(CPFId.CIP_SECURITY_INFORMATION)),
+        ('length',                      UINT(0)),
+        ('security_profiles',           WORD(0)),
+        ('cip_security_state',          USINT(0)),
+        ('ethernetip_security_state',   USINT(0)),
+        ('iana_port_state',             BYTE(0)),
+        ('security_profile_configured', WORD(0)),
+        )
 
     def __str__(self):
         msg = "::ListIdentity Extension 0x01 <CIP security information>\n"
@@ -298,10 +301,10 @@ class CIPSecurityItem(CPF_Item):
 
 class EtherNetIPCapabilityItem(CPF_Item):
     _fields = (
-                ('type_id',                         UINT(CPF.TYPE_ID_ETHERNETIP_CAPABILITY)),
-                ('length',                          UINT(0)),
-                ('transport_application_profile',   DWORD(0)),
-                )
+        ('type_id',                         UINT(CPFId.ETHERNETIP_CAPABILITY)),
+        ('length',                          UINT(0)),
+        ('transport_application_profile',   DWORD(0)),
+        )
 
     def __str__(self):
         msg = "::ListIdentity Extension 0x02 <EtherNet/IP Transports>\n"
@@ -327,10 +330,10 @@ class EtherNetIPCapabilityItem(CPF_Item):
 
 class EtherNetIPUsageItem(CPF_Item):
     _fields = (
-                ('type_id',                     UINT(CPF.TYPE_ID_ETHERNETIP_USAGE)),
-                ('length',                      UINT(0)),
-                ('usage_application_profile',   DWORD(0)),
-                )
+        ('type_id',                     UINT(CPFId.ETHERNETIP_USAGE)),
+        ('length',                      UINT(0)),
+        ('usage_application_profile',   DWORD(0)),
+        )
 
     def __str__(self):
         msg = "::ListIdentity Extension 0x03 <EtherNet/IP Usage>\n"
@@ -344,7 +347,7 @@ class EtherNetIPUsageItem(CPF_Item):
 
 class DTLS_UnconnectedMessageItem(CPF_Item):
     _fields = (
-        ('type_id', UINT(CPF.TYPE_ID_DTLS_UNCONNECTED_MESSAGE)),
+        ('type_id', UINT(CPFId.DTLS_UNCONNECTED_MESSAGE)),
         ('length', UINT(10)),
         ('unconn_msg_type', UINT(1)),
         ('transaction_number', UDINT(0)),

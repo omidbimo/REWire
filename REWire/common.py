@@ -1,6 +1,6 @@
 from REWire.rw_packet import Packet
 from REWire.cip_types import *
-from REWire.rw_enum import EnumThatWorks
+from REWire.rw_enum import REnum
 
 """
 __all__ = [
@@ -9,7 +9,7 @@ __all__ = [
 
     ]
 """
-class CIPObjectId(EnumThatWorks):
+class CIPObjectId(REnum):
     IDENTITY                    = 0X01
     MESSAGE_ROUTER              = 0X02
     DEVICENET                   = 0X03
@@ -39,7 +39,7 @@ class CIPObjectId(EnumThatWorks):
     CERTIFICATE_AUTHENTICATOR   = 0X62
     CONNECTION_CONFIGURATION    = 0XF3
 
-class CIPServiceId(EnumThatWorks):
+class CIPServiceId(REnum):
     GET_ATTRIBUTES_ALL   = 0X01
     SET_ATTRIBUTES_ALL   = 0X02
     RESET                = 0X05

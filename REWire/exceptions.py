@@ -1,7 +1,7 @@
-from REWire.rw_enum import EnumThatWorks
+from REWire.rw_enum import REnum
 from REWire.cip_types import *
 
-class EncapsulationStatus(EnumThatWorks):
+class EncapsulationStatus(REnum):
     SUCCESS                      = 0x00
     INVALID_COMMAND              = 0x01
     INSUFFICIENT_MEMORY          = 0x02
@@ -11,7 +11,7 @@ class EncapsulationStatus(EnumThatWorks):
     UNSUPPORTED_PROTOCOL_VERSION = 0x69
     SERVICE_NOT_ALLOWED_FOR_PORT = 0x6A
 
-class CIP_GeneralStatusCodes(EnumThatWorks):
+class CIP_GeneralStatusCode(REnum):
     SUCCESS                                 = 0X00
     COMMUNICATIONS_RELATED_PROBLEM          = 0X01
     NO_RESOURCE                             = 0X02
@@ -77,7 +77,7 @@ class ExtendedStatus(ARRAY):
 class EncapsulationError(Exception):
     def __init__(self, status):
         self.status = status
-        super(EncapsulationError, self).__init__(
+        super().__init__(
             "Encapsulation request received an unexpected Status: 0x{:08X}({})".format(
             status, EncapsulationStatus.name(status)))
 
@@ -85,4 +85,4 @@ class CIPError(Exception):
     def __init__(self, GSC, ESC=[]):
         self.GeneralStatus = GSC
         self.ExtendedStatus = ESC
-        super().__init__('CIP response status: 0x{:02X}({})-{}'.format(GSC, CIP_GeneralStatusCodes.name(GSC), ESC))
+        super().__init__('CIP response status: 0x{:02X}({})-{}'.format(GSC, CIP_GeneralStatusCode(GSC).name, ESC))

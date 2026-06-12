@@ -5,9 +5,9 @@ log = logging.getLogger(__name__)
 
 from REWire.rw_packet import Packet
 from REWire.cip_types import *
-from REWire.rw_enum import EnumThatWorks
+from REWire.rw_enum import REnum
 
-class CPFId(EnumThatWorks):
+class CPFId(REnum):
     NULL_ADDRESS                = 0x0000
     CIP_IDENTITY                = 0x000C
     CIP_SECURITY_INFORMATION    = 0x0086

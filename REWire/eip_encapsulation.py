@@ -5,7 +5,7 @@ from typing import Literal, Tuple, Annotated
 import random
 import logging
 
-from REWire.rw_enum import EnumThatWorks
+from REWire.rw_enum import REnum
 from REWire.rw_packet import Packet
 from REWire.cip_types import *
 from REWire.rw_socket import RWSocket, RW_TCPSocket, RW_TLSSocket, TCP, UDP
@@ -15,7 +15,7 @@ from REWire.rw_watchdog import WatchdogTimer
 
 logger = logging.getLogger(__name__)
 
-class EncapsulationCommands(EnumThatWorks):
+class EncapsulationCommands(REnum):
     NOP                 = 0x00
     LIST_SERVICES       = 0x04
     LIST_IDENTITY       = 0x63

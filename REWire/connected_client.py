@@ -42,7 +42,7 @@ from REWire.common import (
 from REWire.cip_objects import *
 
 from REWire.exceptions import (
-    CIP_GeneralStatusCodes as GSC,
+    CIP_GeneralStatusCode as GSC,
     CIPError,
     )
 from REWire.unconnected_client import UnconnectedClient

@@ -2,9 +2,9 @@ from REWire.rw_packet import Packet
 from REWire.cip_types import *
 from REWire.cip_object import *
 from REWire.common import CIP_class_attributes, Revision, CIPServiceId
-from REWire.rw_enum import EnumThatWorks
+from REWire.rw_enum import REnum
 
-class Status(EnumThatWorks):
+class Status(REnum):
     NOT_VERIFIED = 0
     VERIFIED = 1
     INVALID = 2

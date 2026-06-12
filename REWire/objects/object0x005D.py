@@ -2,9 +2,9 @@ from REWire.rw_packet import Packet
 from REWire.cip_types import *
 from REWire.cip_object import *
 from REWire.common     import CIP_class_attributes, Revision, CIPServiceId
-from REWire.rw_enum import EnumThatWorks
+from REWire.rw_enum import REnum
 
-class State(EnumThatWorks):
+class State(REnum):
     FACTORY_DEFAULT_CONFIGURATION = 0
     CONFIGURATION_IN_PROGRESS = 1
     CONFIGURED = 2

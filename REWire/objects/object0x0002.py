@@ -15,7 +15,7 @@ class Object0x0002_Services(CIPServiceId):
     SEND_RECEIVE_FRAGMENT = 0x4C
 
 
-class FragmentationFlags(EnumThatWorks):
+class FragmentationFlags(REnum):
     FIRST = 0x01
     LAST  = 0x02
     ABORT = 0x04

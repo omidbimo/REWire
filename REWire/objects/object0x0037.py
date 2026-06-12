@@ -2,7 +2,7 @@ from REWire.rw_packet import Packet
 from REWire.cip_types import *
 from REWire.cip_object import *
 from REWire.common     import *
-from REWire.rw_enum import EnumThatWorks
+from REWire.rw_enum import REnum
 
 from time import sleep
 import logging
@@ -16,7 +16,7 @@ class Object0x0037_Services(CIPServiceId):
     DOWNLOAD_TRANSFER = 0x50
     CLEAR_FILE = 0x51
 
-class State(EnumThatWorks):
+class State(REnum):
     NONEXISTENT = 0
     FILE_EMPTY = 1
     FILE_LOADED = 2
@@ -26,7 +26,7 @@ class State(EnumThatWorks):
     TRANSFER_DOWNLOAD_IN_PROGRESS = 6
     STORING = 7
 
-class CIP_FileEncodingFormat(EnumThatWorks):
+class CIP_FileEncodingFormat(REnum):
     BINARY = 0
     COMPRESSED = 1
     PEM_ENCODEDCERTIFICATE  = 2
@@ -38,7 +38,7 @@ class CIP_FileEncodingFormat(EnumThatWorks):
     EXCEL = 13
     PDF = 14
 
-class CIP_FileInvocationMethod(EnumThatWorks):
+class CIP_FileInvocationMethod(REnum):
     NOACTIONREQUIRED = 0
     RESETTOIDENTITYOBJECT = 1
     POWERCYCLEONDEVICE = 2
@@ -46,21 +46,21 @@ class CIP_FileInvocationMethod(EnumThatWorks):
     APPLICATIONOBJECTINTERNALREQUEST = 4
     NOTAPPLICABLE = 255
 
-class CIP_FilePacketType(EnumThatWorks):
+class CIP_FilePacketType(REnum):
     FIRST_PACKET = 0
     MIDDLE_PACKET = 1
     LAST_PACKET = 2
     ABORT_PACKET = 3
     FIRST_AND_LAST_PACKET = 4
 
-class CIP_FILE_SAVE_PARAMETER(EnumThatWorks):
+class CIP_FILE_SAVE_PARAMETER(REnum):
     AUTOSAVE = 0
     SAVESERVICE = 1
     VOLATILE = 2
     CUSTOM = 3
     CUSTOMANDSAVESERVICE = 4
 
-class CIP_FILE_ACCESS_RULE(EnumThatWorks):
+class CIP_FILE_ACCESS_RULE(REnum):
     READWRITE = 0
     READONLY  = 1
 

@@ -1,5 +1,5 @@
 from REWire.rw_packet import Packet
-from REWire.rw_enum import EnumThatWorks
+from REWire.rw_enum import REnum
 from REWire.cip_types import *
 from REWire.cip_object import *
 from REWire.common import *
@@ -7,7 +7,7 @@ from REWire.common import *
 class Object0x0005_Services(CIPServiceId):
     pass
 
-class State(EnumThatWorks):
+class State(REnum):
     NONEXISTENT = 0
     CONFIGURING = 1
     WAITING_FOR_CONNECTION_ID = 2
@@ -16,23 +16,23 @@ class State(EnumThatWorks):
     DEFERRED_DELETE = 5
     CLOSING = 6
 
-class ConnectionInstanceType(EnumThatWorks):
+class ConnectionInstanceType(REnum):
     EXPLICIT_MESSAGING = 0
     IO_MESSAGING = 1
     CIP_BRIGED = 2
 
-class TransportClass(EnumThatWorks):
+class TransportClass(REnum):
     CLASS0 = 0
     CLASS1 = 1
     CLASS2 = 2
     CLASS3 = 3
 
-class ProductionTrigger(EnumThatWorks):
+class ProductionTrigger(REnum):
     CYCLIC = 0
     CHANGE_OF_STATE = 1
     APPLICATION_OBJECT = 2
 
-class TransportDirection(EnumThatWorks):
+class TransportDirection(REnum):
     CLIENT = 0
     SERVER = 1
 

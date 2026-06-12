@@ -2,7 +2,7 @@ from REWire.cip_types import Packet
 from REWire.cip_types import *
 from REWire.cip_object import *
 from REWire.common import CIP_class_attributes, Revision, CIPServiceId
-from REWire.rw_enums import EnumThatWorks
+from REWire.rw_enum import EnumThatWorks
 from REWire.tls_cipher_suites import *
 
 import string

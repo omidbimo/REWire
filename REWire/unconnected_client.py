@@ -35,11 +35,11 @@ from REWire.exceptions import (
     CIP_GeneralStatusCodes as GSC,
     CIPError,
     )
-from REWire.rw_sockets import *
-
+from REWire.rw_socket import *
+from REWire.rw_socket import DEFAULT_CIPHER_SUITES
 from REWire.utils import *
 from REWire.cip_types import *
-from REWire.rw_sockets import DEFAULT_CIPHER_SUITES
+
 
 logger = logging.getLogger(__name__)
 

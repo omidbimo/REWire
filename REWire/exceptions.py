@@ -1,4 +1,4 @@
-from REWire.rw_enums import EnumThatWorks
+from REWire.rw_enum import EnumThatWorks
 from REWire.cip_types import *
 
 class EncapsulationStatus(EnumThatWorks):

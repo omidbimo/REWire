@@ -5,10 +5,10 @@ from typing import Literal, Tuple, Annotated
 import random
 import logging
 
-from REWire.rw_enums import EnumThatWorks
+from REWire.rw_enum import EnumThatWorks
 from REWire.rw_packet import Packet
 from REWire.cip_types import *
-from REWire.rw_sockets import RWSocket, RW_TCPSocket, RW_TLSSocket, TCP, UDP
+from REWire.rw_socket import RWSocket, RW_TCPSocket, RW_TLSSocket, TCP, UDP
 from REWire.common_packet_format import CPFId, CPF
 from REWire.exceptions import EncapsulationStatus, EncapsulationError
 from REWire.rw_watchdog import WatchdogTimer

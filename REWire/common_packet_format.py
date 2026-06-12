@@ -5,7 +5,7 @@ log = logging.getLogger(__name__)
 
 from REWire.rw_packet import Packet
 from REWire.cip_types import *
-from REWire.rw_enums import EnumThatWorks
+from REWire.rw_enum import EnumThatWorks
 
 class CPFId(EnumThatWorks):
     NULL_ADDRESS                = 0x0000

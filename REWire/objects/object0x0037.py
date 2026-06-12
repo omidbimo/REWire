@@ -2,7 +2,7 @@ from REWire.rw_packet import Packet
 from REWire.cip_types import *
 from REWire.cip_object import *
 from REWire.common     import *
-from REWire.rw_enums import EnumThatWorks
+from REWire.rw_enum import EnumThatWorks
 
 from time import sleep
 import logging

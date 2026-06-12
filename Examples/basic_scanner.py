@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 import REWire.eip_encapsulation as eip_encap
 from REWire.common_packet_format import CPFId
 from REWire.unconnected_client import UnconnectedClient
-from REWire.rw_sockets import UDP, TCP
+from REWire.rw_socket import UDP, TCP
 from REWire.cip_types import *
 
 class BasicScanner():

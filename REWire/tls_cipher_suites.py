@@ -1,4 +1,4 @@
-from REWire.rw_enums import EnumThatWorks
+from REWire.rw_enum import EnumThatWorks
 
 __all__ = [
     'TLS_NULL_WITH_NULL_NULL',

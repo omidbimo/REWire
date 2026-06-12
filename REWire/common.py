@@ -1,6 +1,6 @@
 from REWire.rw_packet import Packet
 from REWire.cip_types import *
-from REWire.rw_enums import EnumThatWorks
+from REWire.rw_enum import EnumThatWorks
 
 """
 __all__ = [

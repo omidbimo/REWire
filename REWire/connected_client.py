@@ -53,22 +53,11 @@ __all__ = [
         "ConnectedClient",
         ]
 
-class Class2_3_PDU(Packet):
+class Class3PDU(Packet):
     _fields = (
         ("sequence_count", UINT(0)),
         ("payload", BYTES()),
         )
-
-
-class Class2_3_Packet(Packet):
-    _fields = (
-                ('item_count',   UINT(2)),
-                ('address_item', ConnectedAddressItem()),
-                ('data_item',    ConnectedDataItem()),
-                )
-
-    def __init__(self, connection_id=0, data=b""):
-        super().__init__(address_item=ConnectedAddressItem(connection_identifier=connection_id), data_item=data)
 
 
 @dataclass
@@ -256,45 +245,32 @@ class ConnectedClient(ExplicitTransport):
         req.request_data = data
         self.seq_counter = UINT((self.seq_counter + 1) & 0XFFFF)
 
-        cmsg = Class2_3_Packet(self.cip_produced_connection_id,
-            self.seq_counter.pack() + req.pack())
+        pdu = Class3PDU(self.seq_counter, req.pack())
 
         if self.session.handle is None:
             raise Exception("No active session to send the connection request!")
 
         self.session.seq_number += 1
-        eip_encap.send_unit_data_send_request(self.session.socket, self.session.handle,
-                payload=cmsg.pack(), sender_context=self.session.seq_number,)
+        eip_encap.send_unit_data(self.session.socket,
+                                self.session.handle,
+                                sender_context=self.session.seq_number,
+                                connection_id=self.cip_produced_connection_id,
+                                payload=pdu.pack(),
+                              )
 
     def cip_service_rcv_response(self, service_id : int, expected_gsc=None, expected_esc=None, timeout=5000, rsp_dt=None):
-        rsp, _  = eip_encap.send_unit_data_rcv_response(self.session.socket,
-                 self.session.seq_number, timeout)
-        class3_rsp = Class2_3_Packet.unpack(rsp)
+        rsp, _  = eip_encap.rcv_unit_data(self.session.socket,
+                                        self.session.seq_number,
+                                        self.cip_consumed_connection_id,
+                                        timeout)
 
-        if class3_rsp.data_item.type_id != CPFId.CONNECTED_DATA:
-            raise Exception(
-                "Unexpected CPF in SendUnitData response! " +
-                "expected:{}, got:{}".format(
-                    CPFId.CONNECTED_DATA,
-                    class3_rsp.data_item.type_id
-                    )
-                )
-        if class3_rsp.data_item.length != len(class3_rsp.data_item.data):
-            raise Exception(
-                "Unexpected data length in Connected message! " +
-                "expected:{}, got:{}".format(
-                    class3_rsp.data_item.length,
-                    len(class3_rsp.data_item.data)
-                    )
-                )
+        class3_pdu = Class3PDU.unpack(rsp.data)
 
-        cls3_pdu = Class2_3_PDU.unpack(class3_rsp.data_item.data)
-
-        if cls3_pdu.sequence_count != self.seq_counter:
+        if class3_pdu.sequence_count != self.seq_counter:
             logger.error("Unexpected sequence counter in response! expected:{}, got:{}".format(
-                self.seq_counter, cls3_pdu.sequence_count))
+                self.seq_counter, class3_pdu.sequence_count))
 
-        mr_rsp = MessageRouterResponse.unpack(cls3_pdu.payload)
+        mr_rsp = MessageRouterResponse.unpack(class3_pdu.payload)
 
         if mr_rsp.service != (service_id | 0x80):   #TODO: correct handling?
             logger.error("Unexpected service ID in response! expected:0x{:X}, got:0x{:X}".format(

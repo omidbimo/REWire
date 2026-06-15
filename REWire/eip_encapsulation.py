@@ -9,7 +9,7 @@ from REWire.rw_enum import REnum
 from REWire.rw_packet import Packet
 from REWire.cip_types import *
 from REWire.rw_socket import RWSocket, RW_TCPSocket, RW_TLSSocket, TCP, UDP
-from REWire.common_packet_format import CPFId, CPF
+from REWire.common_packet_format import CPFId, CPF, ConnectedAddressItem, ConnectedDataItem
 from REWire.exceptions import EncapsulationStatus, EncapsulationError
 from REWire.rw_watchdog import WatchdogTimer
 
@@ -218,39 +218,19 @@ class SendRRDataResponse(Packet):
         )
 
 
-class SendUnitDataRequest(Packet):
+class SendUnitData(Packet):
     _fields = (
         ("command",             UINT(EncapsulationCommands.SEND_UNIT_DATA)),
-        ("length",              UINT(6)),
+        ("length",              UINT(16)),
         ("session_handle",      UDINT(0)),
         ("status",              UDINT(0)),
         ("sender_context",      SenderContext(0)),
         ("options",             UDINT(0)),
         ("interface_handle",    UDINT(0)),
         ("timeout",             UINT(0)),
-        ("encap_packet",        BYTES()),
-        )
-
-    def __init__(self, session_handle, payload, sender_context, timeout):
-        super(SendUnitDataRequest, self).__init__()
-        self.length += UINT(len(payload))
-        self.session_handle = session_handle
-        self.sender_context = SenderContext(sender_context)
-        self.encap_packet = payload
-        self.timeout = UINT(timeout)
-
-
-class SendUnitDataResponse(Packet):
-    _fields = (
-        ("command",             UINT(0)),
-        ("length",              UINT(0)),
-        ("session_handle",      UDINT(0)),
-        ("status",              UDINT(0)),
-        ("sender_context",      SenderContext(0)),
-        ("options",             UDINT(0)),
-        ('interface_handle',    UDINT(0)),
-        ('timeout',             UINT(0)),
-        ('encap_packet',        BYTES()),
+        ('item_count',          UINT(2)),
+        ('address_item',        ConnectedAddressItem()),
+        ('data_item',           ConnectedDataItem()),
         )
 
 
@@ -614,13 +594,23 @@ def send_rr_data_send_request(socket_: RWSocket, session_handle, payload, sender
     socket_.send(req)
 
 
-def send_unit_data_rcv_response(socket_, sender_context, timeout=5000):
+def send_unit_data(socket_: RWSocket, session_handle, sender_context, connection_id, payload, timeout=0):
+    reset_encapsulation_inactivity(socket_)
+    req = SendUnitData( session_handle=session_handle,
+                        sender_context=SenderContext(sender_context),
+                        timeout=UINT(timeout),
+                        address_item=ConnectedAddressItem(connection_identifier=connection_id),
+                        data_item=ConnectedDataItem(data=payload),
+                        length=UINT(len(payload))+20,
+                        )
+    socket_.send(req.pack())
 
+def rcv_unit_data(socket_, sender_context, connection_id, timeout=5000):
     network_rsp = socket_.receive(float(timeout)/1000)
 
     for data, _, timestamp in network_rsp:
 
-        encap_rsp = SendUnitDataResponse.unpack(data)
+        encap_rsp = SendUnitData.unpack(data)
 
         if encap_rsp.command != EncapsulationCommands.SEND_UNIT_DATA:
             logger.warning("Unexpected response to SendUnitData request!" +
@@ -634,15 +624,52 @@ def send_unit_data_rcv_response(socket_, sender_context, timeout=5000):
             logger.error("Unexpected interface handle in response to SendUnitData request!" +
                 " expected:0x{:08X}, got:0x{:08X}".format(encap_rsp.interface_handle, 0))
 
+        if encap_rsp.address_item.type_id != CPFId.CONNECTED_ADDRESS:
+            raise Exception(
+                "Unexpected CPF in SendUnitData response! " +
+                "expected:{}, got:{}".format(
+                    CPFId.CONNECTED_ADDRESS,
+                    encap_rsp.address_item.type_id
+                    )
+                )
+
+        if encap_rsp.address_item.length != 4:
+            raise Exception(
+                "Unexpected data length in Connected message! " +
+                "expected:{}, got:{}".format(
+                    4,
+                    len(encap_rsp.address_item.data)
+                    )
+                )
+
+        if encap_rsp.address_item.connection_identifier != connection_id:
+            raise Exception(
+                "Unexpected Connection Id in SendUnitData response! " +
+                "expected:{}, got:{}".format(
+                    connection_id,
+                    encap_rsp.address_item.connection_identifier
+                    )
+                )
+
+        if encap_rsp.data_item.type_id != CPFId.CONNECTED_DATA:
+            raise Exception(
+                "Unexpected CPF in SendUnitData response! " +
+                "expected:{}, got:{}".format(
+                    CPFId.CONNECTED_DATA,
+                    encap_rsp.data_item.type_id
+                    )
+                )
+
+        if encap_rsp.data_item.length != len(encap_rsp.data_item.data):
+            raise Exception(
+                "Unexpected data length in Connected message! " +
+                "expected:{}, got:{}".format(
+                    encap_rsp.data_item.length,
+                    len(encap_rsp.data_item.data)
+                    )
+                )
+
         reset_encapsulation_inactivity(socket_)
-        return (encap_rsp.encap_packet, timestamp)
+        return (encap_rsp.data_item, timestamp)
 
     raise Exception(f"SendUnitData failed! Received no response from the remote server: {socket_.peer_ip}")
-
-
-def send_unit_data_send_request(socket_: RWSocket, session_handle, payload, sender_context, timeout=0):
-    reset_encapsulation_inactivity(socket_)
-    req = SendUnitDataRequest(session_handle=session_handle, payload=payload,
-            timeout=timeout, sender_context=sender_context)
-    socket_.send(req.pack())
-

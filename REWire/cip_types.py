@@ -1,7 +1,8 @@
 import logging
 logger = logging.getLogger(__name__)
 
-from REWire.rw_packet import Packet
+from .rw_enum import REnum
+from .rw_packet import Packet
 
 __all__ = [
     "SINT",
@@ -116,41 +117,41 @@ class Pack:
     def str(string):
         return pack("{}s".format(len(string)), string)
 
-#class CIP_DATA_TYPE(object):
-CIP_TYPEID_UTIME         = 0xC0
-CIP_TYPEID_BOOL          = 0xC1
-CIP_TYPEID_SINT          = 0xC2
-CIP_TYPEID_INT           = 0xC3
-CIP_TYPEID_DINT          = 0xC4
-CIP_TYPEID_LINT          = 0xC5
-CIP_TYPEID_USINT         = 0xC6
-CIP_TYPEID_UINT          = 0xC7
-CIP_TYPEID_UDINT         = 0xC8
-CIP_TYPEID_ULINT         = 0xC9
-CIP_TYPEID_REAL          = 0xCA
-CIP_TYPEID_LREAL         = 0xCB
-CIP_TYPEID_STIME         = 0xCC
-CIP_TYPEID_DATE          = 0xCD
-CIP_TYPEID_TIME_OF_DAY   = 0xCE
-CIP_TYPEID_DATE_AND_TIME = 0xCF
-CIP_TYPEID_STRING        = 0xD0
-CIP_TYPEID_BYTE          = 0xD1
-CIP_TYPEID_WORD          = 0xD2
-CIP_TYPEID_DWORD         = 0xD3
-CIP_TYPEID_LWORD         = 0xD4
-CIP_TYPEID_STRING2       = 0xD5
-CIP_TYPEID_FTIME         = 0xD6
-CIP_TYPEID_LTIME         = 0xD7
-CIP_TYPEID_ITIME         = 0xD8
-CIP_TYPEID_STRINGN       = 0xD9
-CIP_TYPEID_SHORT_STRING  = 0xDA
-CIP_TYPEID_TIME          = 0xDB
-CIP_TYPEID_EPATH         = 0xDC
-CIP_TYPEID_ENGUNIT       = 0xDD
-CIP_TYPEID_STRINGI       = 0xDE
-CIP_TYPEID_NTIME         = 0xDF
+class CIPDataType(REnum):
+    UTIME         = 0xC0
+    BOOL          = 0xC1
+    SINT          = 0xC2
+    INT           = 0xC3
+    DINT          = 0xC4
+    LINT          = 0xC5
+    USINT         = 0xC6
+    UINT          = 0xC7
+    UDINT         = 0xC8
+    ULINT         = 0xC9
+    REAL          = 0xCA
+    LREAL         = 0xCB
+    STIME         = 0xCC
+    DATE          = 0xCD
+    TIME_OF_DAY   = 0xCE
+    DATE_AND_TIME = 0xCF
+    STRING        = 0xD0
+    BYTE          = 0xD1
+    WORD          = 0xD2
+    DWORD         = 0xD3
+    LWORD         = 0xD4
+    STRING2       = 0xD5
+    FTIME         = 0xD6
+    LTIME         = 0xD7
+    ITIME         = 0xD8
+    STRINGN       = 0xD9
+    SHORT_STRING  = 0xDA
+    TIME          = 0xDB
+    EPATH         = 0xDC
+    ENGUNIT       = 0xDD
+    STRINGI       = 0xDE
+    NTIME         = 0xDF
 
-class CIP_Int(int):
+class CIPInt(int):
 
     def __new__(cls, value=0):
         if not isinstance(value, int):
@@ -209,8 +210,8 @@ class CIP_Int(int):
         return f"{self.__class__.__name__}({int(self)})"
 
 
-class SINT(CIP_Int):
-    _id = CIP_TYPEID_SINT
+class SINT(CIPInt):
+    _id = CIPDataType.SINT
     _min = -128
     _max = 127
     _len = 1
@@ -225,8 +226,8 @@ class SINT(CIP_Int):
         return cls(value), bstream
 
 
-class INT(CIP_Int):
-    _id = CIP_TYPEID_INT
+class INT(CIPInt):
+    _id = CIPDataType.INT
     _min = -32768
     _max = 32767
     _len = 2
@@ -241,8 +242,8 @@ class INT(CIP_Int):
         return cls(value), bstream
 
 
-class DINT(CIP_Int):
-    _id = CIP_TYPEID_DINT
+class DINT(CIPInt):
+    _id = CIPDataType.DINT
     _min = -2147483648
     _max = 2147483647
     _len = 4
@@ -257,8 +258,8 @@ class DINT(CIP_Int):
         return cls(value), bstream
 
 
-class LINT(CIP_Int):
-    _id = CIP_TYPEID_LINT
+class LINT(CIPInt):
+    _id = CIPDataType.LINT
     _id = 0xD5
     _min = -9223372036854775808
     _max = 9223372036854775807
@@ -274,8 +275,8 @@ class LINT(CIP_Int):
         return cls(value), bstream
 
 
-class USINT(CIP_Int):
-    _id = CIP_TYPEID_USINT
+class USINT(CIPInt):
+    _id = CIPDataType.USINT
     _min = 0
     _max = 255
     _len = 1
@@ -291,14 +292,14 @@ class USINT(CIP_Int):
 
 
 class BOOL(USINT):
-    _id = CIP_TYPEID_BOOL
+    _id = CIPDataType.BOOL
     _min = 0
     _max = 1
     _len = 1
 
 
-class UINT(CIP_Int):
-    _id = CIP_TYPEID_UINT
+class UINT(CIPInt):
+    _id = CIPDataType.UINT
     _min = 0
     _max = 65535
     _len = 2
@@ -313,8 +314,8 @@ class UINT(CIP_Int):
         return cls(value), bstream
 
 
-class UDINT(CIP_Int):
-    _id = CIP_TYPEID_UDINT
+class UDINT(CIPInt):
+    _id = CIPDataType.UDINT
     _min = 0
     _max = 4294967295
     _len = 4
@@ -329,8 +330,8 @@ class UDINT(CIP_Int):
         return cls(value), bstream
 
 
-class ULINT(CIP_Int):
-    _id = CIP_TYPEID_ULINT
+class ULINT(CIPInt):
+    _id = CIPDataType.ULINT
     _min = 0
     _max = 18446744073709551615
     _len = 8
@@ -346,35 +347,35 @@ class ULINT(CIP_Int):
 
 
 class BYTE(USINT):
-    _id = CIP_TYPEID_BYTE
+    _id = CIPDataType.BYTE
 
 
 class WORD(UINT):
-    _id = CIP_TYPEID_WORD
+    _id = CIPDataType.WORD
 
 
 class DWORD(UDINT):
-    _id = CIP_TYPEID_DWORD
+    _id = CIPDataType.DWORD
 
 
 class LWORD(ULINT):
-    _id = CIP_TYPEID_LWORD
+    _id = CIPDataType.LWORD
 
 
 class STIME(ULINT):
-    _id = CIP_TYPEID_STIME
+    _id = CIPDataType.STIME
 
 
 class ITIME(INT):
-    _id = CIP_TYPEID_ITIME
+    _id = CIPDataType.ITIME
 
 
 class TIME(DINT):
-    _id = CIP_TYPEID_TIME
+    _id = CIPDataType.TIME
 
 
 class DATE():
-    _id = CIP_TYPEID_DATE
+    _id = CIPDataType.DATE
     #TODO
 
 class ARRAY(list):
@@ -1075,7 +1076,7 @@ class ELECTRONIC_KEY_5(ELECTRONIC_KEY_SEGMENT):
 
 
 class EPATH(ARRAY):
-    _id = CIP_TYPEID_EPATH
+    _id = CIPDataType.EPATH
 
     def __init__(self, segments):
         super().__init__(dtype=CIP_SEGMENT, items=segments)

@@ -45,7 +45,7 @@ class Revision(BYTES):
         return super().dissect(bstream, 2)
 
 
-class CPF_Item(Packet):
+class CPFItem(Packet):
     @classmethod
     def dissect(cls, bstream):
         type_id, _ = UINT.dissect(bstream) # Do not update bstream
@@ -80,38 +80,37 @@ class CPF_Item(Packet):
         else:
             raise Exception(f"Unknown CPF item: 0x{type_id:X}")
         # Don't call the item_type.dissect(). this will recall the super.dissect which is this
-        # method and leads to recursion. The only way to avoid recursion is to call the CPF_Item's super
+        # method and leads to recursion. The only way to avoid recursion is to call the CPFItem's super
         # and pass the cls explicitly
-        return super(CPF_Item, item_type).dissect(bstream)
+        return super(CPFItem, item_type).dissect(bstream)
 
 
 class CPF(ARRAY):
-
     def __init__(self, items=None):
         items = items or []
-        super().__init__(dtype=CPF_Item, items=items)
+        super().__init__(dtype=CPFItem, items=items)
 
     def pack(self):
         return UINT(len(self)).pack() + self.pack()
 
     @classmethod
     def unpack(cls, bstream):
-        return super().unpack(bstream, CPF_Item)
+        return super().unpack(bstream, CPFItem)
 
     @classmethod
     def dissect(cls, bstream):
         item_count, bstream = UINT.dissect(bstream)
-        return super().dissect(bstream, CPF_Item, item_count)
+        return super().dissect(bstream, CPFItem, item_count)
 
 
-class NullAddressItem(CPF_Item):
+class NullAddressItem(CPFItem):
     _fields = (
         ('type_id', UINT(CPFId.NULL_ADDRESS)),
         ('length',  UINT(0)),
         )
 
 
-class ConnectedAddressItem(CPF_Item):
+class ConnectedAddressItem(CPFItem):
     _fields = (
         ('type_id', UINT(CPFId.CONNECTED_ADDRESS)),
         ('length', UINT(4)),
@@ -119,7 +118,7 @@ class ConnectedAddressItem(CPF_Item):
         )
 
 
-class SequencedAddressItem(CPF_Item):
+class SequencedAddressItem(CPFItem):
     _fields = (
         ('type_id', UINT(CPFId.SEQUENCED_ADDRESS)),
         ('length', UINT(0)),
@@ -128,7 +127,7 @@ class SequencedAddressItem(CPF_Item):
         )
 
 
-class UnconnectedDataItem(CPF_Item):
+class UnconnectedDataItem(CPFItem):
     _fields = (
         ('type_id', UINT(CPFId.UNCONNECTED_DATA)),
         ('length', UINT(0)),
@@ -139,7 +138,7 @@ class UnconnectedDataItem(CPF_Item):
         super().__init__(length=len(data), data=data)
 
 
-class ConnectedDataItem(CPF_Item):
+class ConnectedDataItem(CPFItem):
     _fields = (
         ('type_id', UINT(CPFId.CONNECTED_DATA)),
         ('length', UINT(0)),
@@ -150,7 +149,7 @@ class ConnectedDataItem(CPF_Item):
         super().__init__(length=len(data), data=data)
 
 
-class ListServicesItem(CPF_Item):
+class ListServicesItem(CPFItem):
     _fields = (
         ('type_id', UINT(CPFId.LIST_SERVICES)),
         ('length', UINT(0)),
@@ -173,7 +172,7 @@ class ListServicesItem(CPF_Item):
         return msg
 
 
-class SockaddrInfoItem(CPF_Item):
+class SockaddrInfoItem(CPFItem):
     _fields = (
         ('type_id', UINT(0)),
         ('length', UINT(0)),
@@ -184,7 +183,7 @@ class SockaddrInfoItem(CPF_Item):
         )
 
 
-class CIPIdentityItem(CPF_Item):
+class CIPIdentityItem(CPFItem):
     _fields = (
         ('type_id', UINT(CPFId.CIP_IDENTITY)),
         ('length', UINT(0)),
@@ -221,7 +220,7 @@ class CIPIdentityItem(CPF_Item):
             )
 
 
-class CIPSecurityItem(CPF_Item):
+class CIPSecurityItem(CPFItem):
     _fields = (
         ('type_id',                     UINT(CPFId.CIP_SECURITY_INFORMATION)),
         ('length',                      UINT(0)),
@@ -301,7 +300,7 @@ class CIPSecurityItem(CPF_Item):
             msg += "    - CIP User Authentication Profile"
         return msg
 
-class EtherNetIPCapabilityItem(CPF_Item):
+class EtherNetIPCapabilityItem(CPFItem):
     _fields = (
         ('type_id',                         UINT(CPFId.ETHERNETIP_CAPABILITY)),
         ('length',                          UINT(0)),
@@ -330,7 +329,7 @@ class EtherNetIPCapabilityItem(CPF_Item):
         return msg
 
 
-class EtherNetIPUsageItem(CPF_Item):
+class EtherNetIPUsageItem(CPFItem):
     _fields = (
         ('type_id',                     UINT(CPFId.ETHERNETIP_USAGE)),
         ('length',                      UINT(0)),
@@ -347,7 +346,7 @@ class EtherNetIPUsageItem(CPF_Item):
         return msg
 
 
-class DTLS_UnconnectedMessageItem(CPF_Item):
+class DTLS_UnconnectedMessageItem(CPFItem):
     _fields = (
         ('type_id', UINT(CPFId.DTLS_UNCONNECTED_MESSAGE)),
         ('length', UINT(10)),

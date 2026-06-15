@@ -1,0 +1,70 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/25.0.2 Chrome/128.0.6613.186 Electron/32.2.5 Safari/537.36" version="25.0.2">
+  <diagram name="Seite-1" id="qup6g-sipIuYCJ1RVaiv">
+    <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-1" value="rw_socket.py" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="480" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-2" value="TCP/TLS" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="480" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-3" value="UDP/DTLS" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="480" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-4" value="io_client.py" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="280" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-6" value="eip_encapsulation.py" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="440" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-7" value="Encapsulation Services" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="440" width="300" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-8" value="Implicit class0/1 communication" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="280" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-9" value="explicit_transport.py" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="400" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-10" value="Explicit client" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="400" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-11" value="unconnected_client.py" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="360" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-12" value="connected_client.py" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="320" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-13" value="UCMM communication" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="360" width="140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-14" value="Connected class3 communication" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="320" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-15" value="Modules" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="80" y="240" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-16" value="Functionality" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="300" y="240" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-17" value="REWire&#39;s layering model" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="540" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-18" value="" style="shape=flexArrow;endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.825;entryY=1.025;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" target="SP0Wmqe95TyNL_ryzytW-8">
+          <mxGeometry width="100" height="100" relative="1" as="geometry">
+            <mxPoint x="530" y="478" as="sourcePoint" />
+            <mxPoint x="503.03999999999996" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SP0Wmqe95TyNL_ryzytW-21" value="" style="shape=flexArrow;endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.85;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;endWidth=10;endSize=3.67;startWidth=10;startSize=3.67;" edge="1" parent="1" target="SP0Wmqe95TyNL_ryzytW-14">
+          <mxGeometry width="100" height="100" relative="1" as="geometry">
+            <mxPoint x="370" y="400" as="sourcePoint" />
+            <mxPoint x="460" y="380" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

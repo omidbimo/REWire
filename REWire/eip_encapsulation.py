@@ -255,8 +255,7 @@ class SendUnitDataResponse(Packet):
 
 
 class EncapSession():
-    def __init__(self, socket_: RWSocket=None, timeout: float=120.0):
-
+    def __init__(self, socket_: RWSocket, timeout: float=120.0):
         self.handle = None
         self.seq_number = 0 # handle << 32
         self._owners = [] # Connections using this session
@@ -267,6 +266,10 @@ class EncapSession():
             raise Exception(f"Invalid socket of type {type(socket_)}! A socket of type TCP or TLS is required.")
 
         self.socket = socket_
+
+    @classmethod
+    def from_addr(cls, host_ip: str, server_ip: str, **kwargs):
+        return cls(TCP(host_ip, server_ip), kwargs)
 
     def open(self):
         if self.peer_ip is None:
@@ -403,6 +406,7 @@ def list_services_unpack_response(rsp_data, time_ref):
                 "0x{:02X}".format(item.type_id))
     return services
 
+
 def list_services(socket_: RWSocket):
     reset_encapsulation_inactivity(socket_)
     req = ListServicesRequest(sender_context=SenderContext(500)).pack()
@@ -412,6 +416,7 @@ def list_services(socket_: RWSocket):
     network_rsp = socket_.receive(1.0)
 
     return list_services_unpack_response(network_rsp, time_ref=t_send)
+
 
 def list_identity_unpack_response(rsp_data, time_ref):
     """ Unpacks responses to a ListIdentity request.
@@ -460,6 +465,7 @@ def list_identity_unpack_response(rsp_data, time_ref):
         discovered.append({"address":sender_addr, "cpf_items":identity_items, "delay":timestamp - time_ref})
     return discovered
 
+
 def list_identity(socket_: RWSocket, max_delay_ms=500):
     """
     Performs a send/receive cycle for the encapsulation command: 0x0063 (ListIdentity)
@@ -499,6 +505,7 @@ def list_identity(socket_: RWSocket, max_delay_ms=500):
     network_rsp = socket_.receive(float(max_delay_ms)/1000)
     return list_identity_unpack_response(network_rsp, t_send)
 
+
 def list_interfaces(socket_: RWSocket):
     reset_encapsulation_inactivity(socket_)
     req = ListInterfacesRequest(sender_context=SenderContext(500)).pack()
@@ -506,6 +513,7 @@ def list_interfaces(socket_: RWSocket):
     socket_.send(req)
     t_send = time()
     return socket_.receive(1.0) #TODO: list interfaces response
+
 
 def register_session_unpack_response(rsp_data, req_sender_context):
     for data, _, timestamp in rsp_data:
@@ -536,6 +544,7 @@ def register_session_unpack_response(rsp_data, req_sender_context):
     raise Exception(
         "Failed to register session! No proper response from the remote server!")
 
+
 def register_session(socket_: RWSocket):
     reset_encapsulation_inactivity(socket_)
     req = RegisterSessionRequest(sender_context=random.randint(0, 0xFFFFFFFFFFFFFFFF))
@@ -546,10 +555,12 @@ def register_session(socket_: RWSocket):
     logger.info(f"Session 0x{session_handle:08X} opened.")
     return session_handle
 
+
 def unregister_session(socket_, session_handle):
     req = UnregisterSessionRequest(session_handle=session_handle,)
     socket_.send(req.pack())
     logger.info(f"Session 0x{session_handle:08X} closed.")
+
 
 def send_rr_data_rcv_response(socket_: RWSocket, sender_context, timeout=5000):
     network_rsp = socket_.receive(float(timeout)/1000)
@@ -581,6 +592,7 @@ def send_rr_data_rcv_response(socket_: RWSocket, sender_context, timeout=5000):
     raise Exception(
         "SendRRData failed! No proper response from the remote server within {:.3f} seconds!".format(timeout))
 
+
 def send_rr_data_send_request(socket_: RWSocket, session_handle, payload, sender_context, timeout=0):
     """
     Sends the encapsulation command 0x006F(SendRRData) to a remote device
@@ -600,6 +612,7 @@ def send_rr_data_send_request(socket_: RWSocket, session_handle, payload, sender
             timeout=timeout, sender_context=sender_context).pack()
 
     socket_.send(req)
+
 
 def send_unit_data_rcv_response(socket_, sender_context, timeout=5000):
 
@@ -625,6 +638,7 @@ def send_unit_data_rcv_response(socket_, sender_context, timeout=5000):
         return (encap_rsp.encap_packet, timestamp)
 
     raise Exception(f"SendUnitData failed! Received no response from the remote server: {socket_.peer_ip}")
+
 
 def send_unit_data_send_request(socket_: RWSocket, session_handle, payload, sender_context, timeout=0):
     reset_encapsulation_inactivity(socket_)

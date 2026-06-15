@@ -126,8 +126,11 @@ class ConnectedClient(ExplicitTransport):
         self.cip_produced_connection_id = 0
         self.watchdog = None
 
-    def open(self):
+    @classmethod
+    def from_addr(cls, host_ip, server_ip, **kwargs):
+        return cls(eip_encap.EncapSession.from_addr(host_ip, server_ip), kwargs)
 
+    def open(self):
         transport_class_and_trigger = TransportClassTrigger(
                 TransportClass.CLASS3,
                 ProductionTrigger.APPLICATION_OBJECT,

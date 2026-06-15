@@ -117,7 +117,7 @@ class Pack:
     def str(string):
         return pack("{}s".format(len(string)), string)
 
-class CIPDataType(REnum):
+class CIPDataTypeId(REnum):
     UTIME         = 0xC0
     BOOL          = 0xC1
     SINT          = 0xC2
@@ -211,7 +211,7 @@ class CIPInt(int):
 
 
 class SINT(CIPInt):
-    _id = CIPDataType.SINT
+    _id = CIPDataTypeId.SINT
     _min = -128
     _max = 127
     _len = 1
@@ -227,7 +227,7 @@ class SINT(CIPInt):
 
 
 class INT(CIPInt):
-    _id = CIPDataType.INT
+    _id = CIPDataTypeId.INT
     _min = -32768
     _max = 32767
     _len = 2
@@ -243,7 +243,7 @@ class INT(CIPInt):
 
 
 class DINT(CIPInt):
-    _id = CIPDataType.DINT
+    _id = CIPDataTypeId.DINT
     _min = -2147483648
     _max = 2147483647
     _len = 4
@@ -259,7 +259,7 @@ class DINT(CIPInt):
 
 
 class LINT(CIPInt):
-    _id = CIPDataType.LINT
+    _id = CIPDataTypeId.LINT
     _id = 0xD5
     _min = -9223372036854775808
     _max = 9223372036854775807
@@ -276,7 +276,7 @@ class LINT(CIPInt):
 
 
 class USINT(CIPInt):
-    _id = CIPDataType.USINT
+    _id = CIPDataTypeId.USINT
     _min = 0
     _max = 255
     _len = 1
@@ -292,14 +292,14 @@ class USINT(CIPInt):
 
 
 class BOOL(USINT):
-    _id = CIPDataType.BOOL
+    _id = CIPDataTypeId.BOOL
     _min = 0
     _max = 1
     _len = 1
 
 
 class UINT(CIPInt):
-    _id = CIPDataType.UINT
+    _id = CIPDataTypeId.UINT
     _min = 0
     _max = 65535
     _len = 2
@@ -315,7 +315,7 @@ class UINT(CIPInt):
 
 
 class UDINT(CIPInt):
-    _id = CIPDataType.UDINT
+    _id = CIPDataTypeId.UDINT
     _min = 0
     _max = 4294967295
     _len = 4
@@ -331,7 +331,7 @@ class UDINT(CIPInt):
 
 
 class ULINT(CIPInt):
-    _id = CIPDataType.ULINT
+    _id = CIPDataTypeId.ULINT
     _min = 0
     _max = 18446744073709551615
     _len = 8
@@ -347,35 +347,35 @@ class ULINT(CIPInt):
 
 
 class BYTE(USINT):
-    _id = CIPDataType.BYTE
+    _id = CIPDataTypeId.BYTE
 
 
 class WORD(UINT):
-    _id = CIPDataType.WORD
+    _id = CIPDataTypeId.WORD
 
 
 class DWORD(UDINT):
-    _id = CIPDataType.DWORD
+    _id = CIPDataTypeId.DWORD
 
 
 class LWORD(ULINT):
-    _id = CIPDataType.LWORD
+    _id = CIPDataTypeId.LWORD
 
 
 class STIME(ULINT):
-    _id = CIPDataType.STIME
+    _id = CIPDataTypeId.STIME
 
 
 class ITIME(INT):
-    _id = CIPDataType.ITIME
+    _id = CIPDataTypeId.ITIME
 
 
 class TIME(DINT):
-    _id = CIPDataType.TIME
+    _id = CIPDataTypeId.TIME
 
 
 class DATE():
-    _id = CIPDataType.DATE
+    _id = CIPDataTypeId.DATE
     #TODO
 
 class ARRAY(list):
@@ -1076,7 +1076,7 @@ class ELECTRONIC_KEY_5(ELECTRONIC_KEY_SEGMENT):
 
 
 class EPATH(ARRAY):
-    _id = CIPDataType.EPATH
+    _id = CIPDataTypeId.EPATH
 
     def __init__(self, segments):
         super().__init__(dtype=CIP_SEGMENT, items=segments)

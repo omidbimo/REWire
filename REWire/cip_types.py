@@ -479,6 +479,20 @@ class BYTES(bytearray):
         return self
 
     @classmethod
+    def unpack(cls, bstream, error_on_excess=True):
+        """
+        Unpack bytes from bstream and convert them to the specified data format
+        Returns the unpacked data
+        """
+        value, bstream = cls.dissect(bstream)
+
+        if error_on_excess is True and len(bstream) > 0:
+            raise Exception(
+                f"Excess data in bstream! {cls.__name__} unpack requires a bstream of exactly {cls._len} bytes but got {cls._len+len(bstream)} byte(s)."
+            )
+        return value
+
+    @classmethod
     def dissect(cls, bstream, length=None):
         if length is None:
             length = len(bstream)

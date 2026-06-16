@@ -9,9 +9,16 @@ from REWire.rw_enum import REnum
 from REWire.rw_packet import Packet
 from REWire.cip_types import *
 from REWire.rw_socket import RWSocket, RW_TCPSocket, RW_TLSSocket, TCP, UDP
-from REWire.common_packet_format import CPFId, CPF, ConnectedAddressItem, ConnectedDataItem
 from REWire.exceptions import EncapsulationStatus, EncapsulationError
 from REWire.rw_watchdog import WatchdogTimer
+from .common_packet_format import (
+    CPF,
+    CPFId,
+    ConnectedAddressItem,
+    ConnectedDataItem,
+    NullAddressItem,
+    UnconnectedDataItem,
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -181,8 +188,7 @@ class UnregisterSessionRequest(Packet):
     def __init__(self, session_handle):
         super().__init__(session_handle=session_handle)
 
-
-class SendRRDataRequest(Packet):
+class SendRRData(Packet):
     _fields = (
         ("command",             UINT(EncapsulationCommands.SEND_RR_DATA)),
         ("length",              UINT(6)),
@@ -192,29 +198,9 @@ class SendRRDataRequest(Packet):
         ("options",             UDINT(0)),
         ('interface_handle',    UDINT(0)), # Shall be zero when encapsulating CIP
         ('timeout',             UINT(0)),
-        ('encap_packet',        BYTES()),
-        )
-
-    def __init__(self, session_handle, payload, timeout, sender_context):
-        super(SendRRDataRequest, self).__init__()
-        self.length += len(payload)
-        self.session_handle = session_handle
-        self.sender_context = SenderContext(sender_context)
-        self.timeout = UINT(timeout)
-        self.encap_packet = payload
-
-
-class SendRRDataResponse(Packet):
-    _fields = (
-        ("command",             UINT(0)),
-        ("length",              UINT(0)),
-        ("session_handle",      UDINT(0)),
-        ("status",              UDINT(0)),
-        ("sender_context",      SenderContext(0)),
-        ("options",             UDINT(0)),
-        ('interface_handle',    UDINT(0)),
-        ('timeout',             UINT(0)),
-        ('encap_packet',        BYTES()),
+        ('item_count',          UINT(2)),
+        ('address_item',        NullAddressItem()),
+        ('data_item',           UnconnectedDataItem()),
         )
 
 
@@ -542,12 +528,36 @@ def unregister_session(socket_, session_handle):
     logger.info(f"Session 0x{session_handle:08X} closed.")
 
 
-def send_rr_data_rcv_response(socket_: RWSocket, sender_context, timeout=5000):
+def send_rr_data(socket_: RWSocket, session_handle, sender_context, payload, timeout=0):
+    """
+    Sends the encapsulation command 0x006F(SendRRData) to a remote device
+    - Only TCP-based transport is supported
+
+    param: sock : REW_SocketWrapper
+    param: session_handle
+    param: payload
+    param: timeout  note: When encpsulating CIP, the timeout shall be zero
+    param: sender_context
+
+    return: -
+    """
+
+    reset_encapsulation_inactivity(socket_)
+    req = SendRRData(session_handle=session_handle,
+                     sender_context=SenderContext(sender_context),
+                     data_item=UnconnectedDataItem(data=payload, length=len(payload)),
+                     length=UINT(len(payload))+16,
+                     timeout=timeout,
+                     )
+
+    socket_.send(req.pack())
+
+def rcv_rr_data(socket_: RWSocket, sender_context, timeout=5000):
     network_rsp = socket_.receive(float(timeout)/1000)
 
     for data, _, timestamp in network_rsp:
 
-        encap_rsp = SendRRDataResponse.unpack(data)
+        encap_rsp = SendRRData.unpack(data)
 
         if encap_rsp.command != EncapsulationCommands.SEND_RR_DATA:
             logger.warning("Unexpected response to SendRRData request!" +
@@ -566,32 +576,12 @@ def send_rr_data_rcv_response(socket_: RWSocket, sender_context, timeout=5000):
         if encap_rsp.interface_handle != 0:
             logger.error("Unexpected interface handle in response to SendRRData request!" +
                 " expected:0x{:08X}, got:0x{:08X}".format(encap_rsp.interface_handle, 0))
+
         reset_encapsulation_inactivity(socket_)
-        return (encap_rsp.encap_packet, timestamp)
+        return (encap_rsp.data_item, timestamp)
 
     raise Exception(
         "SendRRData failed! No proper response from the remote server within {:.3f} seconds!".format(timeout))
-
-
-def send_rr_data_send_request(socket_: RWSocket, session_handle, payload, sender_context, timeout=0):
-    """
-    Sends the encapsulation command 0x006F(SendRRData) to a remote device
-    - Only TCP-based transport is supported
-
-    param: sock : REW_SocketWrapper
-    param: session_handle
-    param: payload
-    param: timeout  note: When encpsulating CIP, the timeout shall be zero
-    param: sender_context
-
-    return: -
-    """
-
-    reset_encapsulation_inactivity(socket_)
-    req = SendRRDataRequest(session_handle=session_handle, payload=payload,
-            timeout=timeout, sender_context=sender_context).pack()
-
-    socket_.send(req)
 
 
 def send_unit_data(socket_: RWSocket, session_handle, sender_context, connection_id, payload, timeout=0):
@@ -603,6 +593,7 @@ def send_unit_data(socket_: RWSocket, session_handle, sender_context, connection
                         data_item=ConnectedDataItem(data=payload),
                         length=UINT(len(payload))+20,
                         )
+
     socket_.send(req.pack())
 
 def rcv_unit_data(socket_, sender_context, connection_id, timeout=5000):

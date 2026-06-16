@@ -40,17 +40,6 @@ from .cip_types import *
 
 logger = logging.getLogger(__name__)
 
-class UCMMRequest(Packet):
-    _fields = (
-        ('item_count',   UINT(2)),
-        ('address_item', NullAddressItem()),
-        ('data_item',    UnconnectedDataItem()),
-        )
-
-
-class UCMMResponse(UCMMRequest):
-    pass
-
 
 class DTLS_UnconnectedEncapPacket(Packet):
     _fields = (
@@ -93,8 +82,6 @@ class UnconnectedClient(ExplicitTransport):
         if self.session:
             self.session.open()
 
-        ucmm_req = UCMMRequest()
-
         mr_req = MessageRouterRequest(service=service_id)
         if ekey is not None:
             mr_req.request_path += ekey
@@ -108,27 +95,26 @@ class UnconnectedClient(ExplicitTransport):
             logger.warning(inspect.currentframe().f_code.co_name +
                 "Request ({} bytes) longer than maximum Message-Router size (504 bytes).".format(len(mr_req.pack())))
 
-        ucmm_req.data_item = UnconnectedDataItem(mr_req.pack())
+        eip_encap.send_rr_data( self.session.socket,
+                                self.session.handle,
+                                sender_context = self.session.seq_number,
+                                payload = mr_req.pack(),
+                                )
 
-        eip_encap.send_rr_data_send_request(self.session.socket, self.session.handle, payload = ucmm_req.pack(),
-                 sender_context = self.session.seq_number, timeout = 0,)
 
     def cip_service_rcv_response(self, service_id, timeout=3000, rsp_dt=None):
-        rsp, _ = eip_encap.send_rr_data_rcv_response(self.session.socket,
-                    self.session.seq_number, timeout)
+        rsp, _ = eip_encap.rcv_rr_data(self.session.socket, self.session.seq_number, timeout)
 
-        ucmm_rsp = UCMMResponse.unpack(rsp)
-
-        if ucmm_rsp.data_item.type_id != CPFId.UNCONNECTED_DATA:
+        if rsp.type_id != CPFId.UNCONNECTED_DATA:
             raise Exception("Unexpected CPF in SendRRData response! " +
-                "expected:{}, got:{}".format(CPFId.UNCONNECTED_DATA, ucmm_rsp.data_item.type_id))
+                "expected:{}, got:{}".format(CPFId.UNCONNECTED_DATA, rsp.type_id))
 
-        if ucmm_rsp.data_item.length != len(ucmm_rsp.data_item.data):
+        if rsp.length != len(rsp.data):
             raise Exception("Unexpected data length in Unconnected message! " +
-                            "expected:{}, got:{}".format(ucmm_rsp.data_item.length,
-                                                         len(ucmm_rsp.data_item.data) ))
+                            "expected:{}, got:{}".format(rsp.length,
+                                                         len(rsp.data) ))
 
-        mr_rsp = MessageRouterResponse.unpack(ucmm_rsp.data_item.data)
+        mr_rsp = MessageRouterResponse.unpack(rsp.data)
         if mr_rsp.service != (service_id | 0x80):
             raise Exception("Unexpected service ID in response! expected:{}, got:{}".format(
                 (service_id | 0x80), mr_rsp.service))

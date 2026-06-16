@@ -134,9 +134,6 @@ class UnconnectedDataItem(CPFItem):
         ('data', BYTES()),
         )
 
-    def __init__(self, data=b""):
-        super().__init__(length=len(data), data=data)
-
 
 class ConnectedDataItem(CPFItem):
     _fields = (

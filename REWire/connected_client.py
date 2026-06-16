@@ -1,31 +1,30 @@
-from time import sleep
-import inspect
 import random
-from typing import Any, Optional, Tuple, Union
 from dataclasses import dataclass
 import logging
 
-import REWire.eip_encapsulation as eip_encap
-from REWire.rw_packet import Packet
-from REWire.rw_watchdog import WatchdogTimer
-from REWire.common_packet_format import (
+from .rw_packet import Packet
+from . import eip_encapsulation as eip_encap
+from .rw_watchdog import WatchdogTimer
+from .common_packet_format import (
     CPF,
     CPFId,
     ConnectedAddressItem,
     ConnectedDataItem,
     )
 
-from REWire.cip_types import *
-from REWire.utils import *
-from REWire.explicit_transport import ExplicitTransport, MessageRouterRequest, MessageRouterResponse
+from .explicit_transport import (
+    ExplicitTransport,
+    MessageRouterRequest,
+    MessageRouterResponse,
+    )
 
-from REWire.objects.object0x0006 import (
+from .objects.object0x0006 import (
     NetworkConnectionParameters,
     ConnectionType,
     Priority,
     )
 
-from REWire.objects.object0x0005 import (
+from .objects.object0x0005 import (
     State,
     TransportClass,
     ProductionTrigger,
@@ -34,18 +33,16 @@ from REWire.objects.object0x0005 import (
     TransportDirection,
     )
 
-from REWire.common import (
+from .common import (
     CIPServiceId,
     CIPObjectId,
     CIPGeneralStatus as GSC,
     )
 
-from REWire.cip_objects import *
-
-from REWire.exceptions import (
-    CIPError,
-    )
-from REWire.unconnected_client import UnconnectedClient
+from .cip_objects import *
+from .exceptions import CIPError
+from .unconnected_client import UnconnectedClient
+from .cip_types import *
 
 logger = logging.getLogger(__name__)
 
@@ -97,7 +94,7 @@ class ConnectedClient(ExplicitTransport):
 
 
         """
-        super(ConnectedClient, self).__init__()
+        super().__init__()
 
         self.o2t_rpi = o2t_rpi
         self.t2o_rpi = t2o_rpi

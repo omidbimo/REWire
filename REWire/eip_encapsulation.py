@@ -1,16 +1,14 @@
-
-
 from time import time, sleep, asctime
 from typing import Literal, Tuple, Annotated
 import random
 import logging
 
-from REWire.rw_enum import REnum
-from REWire.rw_packet import Packet
-from REWire.cip_types import *
-from REWire.rw_socket import RWSocket, RW_TCPSocket, RW_TLSSocket, TCP, UDP
-from REWire.exceptions import EncapsulationStatus, EncapsulationError
-from REWire.rw_watchdog import WatchdogTimer
+from .rw_enum import REnum
+from .rw_packet import Packet
+from .cip_types import *
+from .rw_socket import RWSocket, RW_TCPSocket, RW_TLSSocket, TCP, UDP
+from .exceptions import EncapsulationStatus, EncapsulationError
+from .rw_watchdog import WatchdogTimer
 from .common_packet_format import (
     CPF,
     CPFId,

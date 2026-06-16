@@ -568,17 +568,23 @@ def rcv_rr_data(socket_: RWSocket, sender_context, timeout=5000):
             raise EncapsulationError(encap_rsp.status)
 
         if encap_rsp.sender_context != SenderContext(sender_context):
-            raise Exception(
-                "Unexpected encap sender_context in SendRRData response! " +
-                "expected:{}, got={}".format(sender_context,
-                    encap_rsp.sender_context))
+            raise Exception("Unexpected encap sender_context in SendRRData response! " +
+                            f"expected:{sender_context}, got={encap_rsp.sender_context}")
 
         if encap_rsp.interface_handle != 0:
             logger.error("Unexpected interface handle in response to SendRRData request!" +
-                " expected:0x{:08X}, got:0x{:08X}".format(encap_rsp.interface_handle, 0))
+                f" expected:0x{encap_rsp.interface_handle:08X}, got:0x{0:08X}")
+
+        if encap_rsp.data_item.type_id != CPFId.UNCONNECTED_DATA:
+            raise Exception("Unexpected CPF in SendRRData response! " +
+                            f"expected:{CPFId.UNCONNECTED_DATA}, got:{encap_rsp.data_item.type_id}")
+
+        if encap_rsp.data_item.length != len(encap_rsp.data_item.data):
+            raise Exception("Unexpected data length in Unconnected message! " +
+                            f"expected:{encap_rsp.data_item.length}, got:{len(encap_rsp.data_item.data)}")
 
         reset_encapsulation_inactivity(socket_)
-        return (encap_rsp.data_item, timestamp)
+        return (encap_rsp.data_item.data, timestamp)
 
     raise Exception(
         "SendRRData failed! No proper response from the remote server within {:.3f} seconds!".format(timeout))
@@ -613,54 +619,29 @@ def rcv_unit_data(socket_, sender_context, connection_id, timeout=5000):
 
         if encap_rsp.interface_handle != 0:
             logger.error("Unexpected interface handle in response to SendUnitData request!" +
-                " expected:0x{:08X}, got:0x{:08X}".format(encap_rsp.interface_handle, 0))
+                         f" expected:0x{encap_rsp.interface_handle:08X}, got:0x{0:08X}")
 
         if encap_rsp.address_item.type_id != CPFId.CONNECTED_ADDRESS:
-            raise Exception(
-                "Unexpected CPF in SendUnitData response! " +
-                "expected:{}, got:{}".format(
-                    CPFId.CONNECTED_ADDRESS,
-                    encap_rsp.address_item.type_id
-                    )
-                )
+            raise Exception("Unexpected CPF in SendUnitData response! " +
+                            f"expected:{CPFId.CONNECTED_ADDRESS}, got:{encap_rsp.address_item.type_id}")
 
         if encap_rsp.address_item.length != 4:
-            raise Exception(
-                "Unexpected data length in Connected message! " +
-                "expected:{}, got:{}".format(
-                    4,
-                    len(encap_rsp.address_item.data)
-                    )
-                )
+            raise Exception("Unexpected data length in Connected message! " +
+                            f"expected:4 bytes, got:{len(encap_rsp.address_item.data)} bytes.")
 
         if encap_rsp.address_item.connection_identifier != connection_id:
-            raise Exception(
-                "Unexpected Connection Id in SendUnitData response! " +
-                "expected:{}, got:{}".format(
-                    connection_id,
-                    encap_rsp.address_item.connection_identifier
-                    )
-                )
+            raise Exception("Unexpected Connection Id in SendUnitData response! " +
+                            f"expected:{connection_id}, got:{encap_rsp.address_item.connection_identifier}")
 
         if encap_rsp.data_item.type_id != CPFId.CONNECTED_DATA:
-            raise Exception(
-                "Unexpected CPF in SendUnitData response! " +
-                "expected:{}, got:{}".format(
-                    CPFId.CONNECTED_DATA,
-                    encap_rsp.data_item.type_id
-                    )
-                )
+            raise Exception("Unexpected CPF in SendUnitData response! " +
+                            f"expected:{CPFId.CONNECTED_DATA}, got:{encap_rsp.data_item.type_id}")
 
         if encap_rsp.data_item.length != len(encap_rsp.data_item.data):
-            raise Exception(
-                "Unexpected data length in Connected message! " +
-                "expected:{}, got:{}".format(
-                    encap_rsp.data_item.length,
-                    len(encap_rsp.data_item.data)
-                    )
-                )
+            raise Exception("Unexpected data length in Connected message! " +
+                            f"expected:{encap_rsp.data_item.length}, got:{len(encap_rsp.data_item.data)}")
 
         reset_encapsulation_inactivity(socket_)
-        return (encap_rsp.data_item, timestamp)
+        return (encap_rsp.data_item.data, timestamp)
 
     raise Exception(f"SendUnitData failed! Received no response from the remote server: {socket_.peer_ip}")

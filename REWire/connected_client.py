@@ -264,18 +264,17 @@ class ConnectedClient(ExplicitTransport):
                                         self.cip_consumed_connection_id,
                                         timeout)
 
-        class3_pdu = Class3PDU.unpack(rsp.data)
+        class3_pdu = Class3PDU.unpack(rsp)
 
         if class3_pdu.sequence_count != self.seq_counter:
-            logger.error("Unexpected sequence counter in response! expected:{}, got:{}".format(
-                self.seq_counter, class3_pdu.sequence_count))
+            logger.error("Unexpected sequence counter in response!" +
+                         f" expected:{self.seq_counter}, got:{class3_pdu.sequence_count}")
 
         mr_rsp = MessageRouterResponse.unpack(class3_pdu.payload)
 
         if mr_rsp.service != (service_id | 0x80):   #TODO: correct handling?
-            logger.error("Unexpected service ID in response! expected:0x{:X}, got:0x{:X}".format(
-                (service_id | 0x80), mr_rsp.service)
-                )
+            logger.error("Unexpected service ID in response!" +
+                         f"expected:0x{(service_id | 0x80):X}, got:0x{mr_rsp.service:X}")
 
         if mr_rsp.general_status != GSC.SUCCESS:
             raise CIPError(mr_rsp.general_status, mr_rsp.extended_status)

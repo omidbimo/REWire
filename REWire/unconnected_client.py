@@ -105,19 +105,11 @@ class UnconnectedClient(ExplicitTransport):
     def cip_service_rcv_response(self, service_id, timeout=3000, rsp_dt=None):
         rsp, _ = eip_encap.rcv_rr_data(self.session.socket, self.session.seq_number, timeout)
 
-        if rsp.type_id != CPFId.UNCONNECTED_DATA:
-            raise Exception("Unexpected CPF in SendRRData response! " +
-                "expected:{}, got:{}".format(CPFId.UNCONNECTED_DATA, rsp.type_id))
+        mr_rsp = MessageRouterResponse.unpack(rsp)
 
-        if rsp.length != len(rsp.data):
-            raise Exception("Unexpected data length in Unconnected message! " +
-                            "expected:{}, got:{}".format(rsp.length,
-                                                         len(rsp.data) ))
-
-        mr_rsp = MessageRouterResponse.unpack(rsp.data)
         if mr_rsp.service != (service_id | 0x80):
-            raise Exception("Unexpected service ID in response! expected:{}, got:{}".format(
-                (service_id | 0x80), mr_rsp.service))
+            raise Exception("Unexpected service ID in response!" +
+                            f"expected:{(service_id | 0x80)}, got:{mr_rsp.service}")
 
         if mr_rsp.general_status != 0:
             raise CIPError(mr_rsp.general_status, mr_rsp.extended_status)

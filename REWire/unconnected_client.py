@@ -1,4 +1,4 @@
-from time import time, sleep
+from time import time
 import inspect
 import random
 import logging
@@ -33,9 +33,6 @@ from .common import (
     )
 
 from .exceptions import CIPError
-from .rw_socket import *
-from .rw_socket import DEFAULT_CIPHER_SUITES
-from .utils import *
 from .cip_types import *
 
 logger = logging.getLogger(__name__)

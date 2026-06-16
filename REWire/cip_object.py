@@ -1,16 +1,13 @@
-from REWire.common import *
-
 import logging
 logging.basicConfig(level=logging.INFO,
     format='%(asctime)s - %(name)s.%(levelname)-8s %(message)s')
 logger = logging.getLogger(__name__)
 
-from collections import namedtuple
-ATTR_DESC_ITEM = namedtuple('ATTR_DESC_ITEM', 'id name type')
+from .common import CIPServiceId
+
 
 __all__ = [
     'CIP_ObjectCommon',
-    'ATTR_DESC_ITEM',
     ]
 
 class Attributes():

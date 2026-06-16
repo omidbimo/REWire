@@ -1,11 +1,11 @@
-
 from socket import inet_ntoa
 import logging
 log = logging.getLogger(__name__)
 
-from REWire.rw_packet import Packet
-from REWire.cip_types import *
-from REWire.rw_enum import REnum
+from .rw_packet import Packet
+from .rw_enum import REnum
+from .cip_types import *
+
 
 class CPFId(REnum):
     NULL_ADDRESS                = 0x0000

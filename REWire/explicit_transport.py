@@ -1,20 +1,20 @@
-from REWire.rw_packet import Packet
-from REWire.cip_types import *
-from REWire.utils import *
+import logging
+logger = logging.getLogger(__name__)
 
-from REWire.common import (
+from .rw_packet import Packet
+from .cip_types import *
+
+from .common import (
     CIPGeneralStatus as GSC,
     CIPServiceId,
     CIPObjectId,
     )
 
-from REWire.exceptions import (
+from .exceptions import (
     CIPError,
     ExtendedStatus,
     )
 
-import logging
-logger = logging.getLogger(__name__)
 
 class MessageRouterRequest(Packet):
     _fields = (

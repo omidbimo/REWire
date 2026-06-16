@@ -15,7 +15,6 @@ from .common_packet_format import (
 
 from .rw_packet import Packet
 from .cip_types import *
-from .utils import *
 from .explicit_transport import (
     ExplicitTransport,
     MessageRouterRequest,

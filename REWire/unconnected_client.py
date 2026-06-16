@@ -3,21 +3,21 @@ import inspect
 import random
 import logging
 
-import REWire.eip_encapsulation as eip_encap
-from REWire.rw_packet import Packet
-from REWire.common_packet_format import (
+from . import eip_encapsulation as eip_encap
+from .rw_packet import Packet
+from .common_packet_format import (
         CPFId,
         NullAddressItem,
         UnconnectedDataItem,
         )
 
-from REWire.explicit_transport import (
+from .explicit_transport import (
         ExplicitTransport,
         MessageRouterRequest,
         MessageRouterResponse,
         )
 
-from REWire.objects.object0x0005 import (
+from .objects.object0x0005 import (
     State,
     TransportClass,
     ProductionTrigger,
@@ -26,20 +26,17 @@ from REWire.objects.object0x0005 import (
     TransportDirection,
     )
 
-from REWire.common import (
+from .common import (
+    CIPGeneralStatus as GSC,
     CIPServiceId,
     CIPObjectId,
     )
 
-from REWire.exceptions import (
-    CIP_GeneralStatusCode as GSC,
-    CIPError,
-    )
-from REWire.rw_socket import *
-from REWire.rw_socket import DEFAULT_CIPHER_SUITES
-from REWire.utils import *
-from REWire.cip_types import *
-
+from .exceptions import CIPError
+from .rw_socket import *
+from .rw_socket import DEFAULT_CIPHER_SUITES
+from .utils import *
+from .cip_types import *
 
 logger = logging.getLogger(__name__)
 

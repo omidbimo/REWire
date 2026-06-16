@@ -3,12 +3,12 @@ from REWire.cip_types import *
 from REWire.utils import *
 
 from REWire.common import (
+    CIPGeneralStatus as GSC,
     CIPServiceId,
     CIPObjectId,
     )
 
 from REWire.exceptions import (
-    CIP_GeneralStatusCode as GSC,
     CIPError,
     ExtendedStatus,
     )

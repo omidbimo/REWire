@@ -9,6 +9,57 @@ __all__ = [
 
     ]
 """
+class CIPGeneralStatus(REnum):
+    SUCCESS                                 = 0X00
+    COMMUNICATIONS_RELATED_PROBLEM          = 0X01
+    NO_RESOURCE                             = 0X02
+    INVALID_DATA                            = 0X03
+    INVALID_PATH                            = 0X04
+    PATH_DESTINATION_UNKNOWN                = 0X05
+    INCOMPLETE_DATA                         = 0X06
+    CONNECTION_LOST                         = 0X07
+    SERVICE_NOT_SUPPORTED                   = 0X08
+    INVALID_ATTR_VALUE                      = 0X09
+    ATTR_LIST_ERR                           = 0X0A
+    ALREADY_IN_MODE                         = 0X0B
+    OBJ_STATE_CONFLICT                      = 0X0C
+    OBJ_ALREADY_EXISTS                      = 0X0D
+    ATTR_NOT_SETTABLE                       = 0X0E
+    PERMISSION_DENIED                       = 0X0F
+    DEV_STATE_CONFLICT                      = 0X10
+    REPLYDATATOOLARGE                       = 0X11
+    FRAGMENTEDPRIMITIVE                     = 0X12
+    NOTENOUGHDATA                           = 0X13
+    ATTRIBUTE_NOT_SUPPORTED                 = 0X14
+    TOOMUCHDATA                             = 0X15
+    OBJDOESNOTEXIST                         = 0X16
+    INVALIDFRAGMENTAION                     = 0X17
+    DATANOTSAVED                            = 0X18
+    DATASTOREFAILURE                        = 0X19
+    REQUESTTOOLARGE                         = 0X1A
+    RESPONSETOOLARGE                        = 0X1B
+    MISSINGATTRLISTDATA                     = 0X1C
+    INVALIDATTRLIST                         = 0X1D
+    SERVICEERROR                            = 0X1E
+    VENDORSPECIFICERR                       = 0X1F
+    INVALIDPARAMETER                        = 0X20
+    WRITEALREADYDONE                        = 0X21
+    INVALIDREPLY                            = 0X22
+    BUFFEROVERFLOW                          = 0X23
+    INVALIDMSGFORMAT                        = 0X24
+    INVALID_KEY                             = 0X25
+    INVALIDPATHSIZE                         = 0X26
+    UNEXPECTEDATTR                          = 0X27
+    INVALIDMEMBERID                         = 0X28
+    MEMBERNOTSETTABLE                       = 0X29
+    GROUP2GENFAILURE                        = 0X2A
+    UNKNOWNMODBUSERR                        = 0X2B
+    ATTR_NOT_GETTABLE                       = 0X2C
+    INSTANCENOTDELETABLE                    = 0X2D
+    SERVICE_NOT_SUPPORTED_FORSPECIFIC_PATH  = 0X2E
+    FRAGMENTATION_NEEDED                    = 0x2F
+
+
 class CIPObjectId(REnum):
     IDENTITY                    = 0X01
     MESSAGE_ROUTER              = 0X02
@@ -39,6 +90,7 @@ class CIPObjectId(REnum):
     CERTIFICATE_AUTHENTICATOR   = 0X62
     CONNECTION_CONFIGURATION    = 0XF3
 
+
 class CIPServiceId(REnum):
     GET_ATTRIBUTES_ALL   = 0X01
     SET_ATTRIBUTES_ALL   = 0X02
@@ -55,6 +107,7 @@ class CIPServiceId(REnum):
     INSERT_MEMBER        = 0x1A
     REMOVE_MEMBER        = 0x1B
     GET_CONNECTION_POINT_MEMBER_LIST = 0x1D
+
 
 class CIP_Object_Attribute():
     def __init__(self,
@@ -75,25 +128,6 @@ class CIP_Object_Attribute():
                 'value:        {}\n'.self.value(self.value) +
                 'name:         {}'.format(self.name)
                 )
-
-class CIP_Object_ClassAttributes():
-    def __init__(self,
-        revision,
-        max_instamce,
-        number_of_instances,
-        attribute_list,
-        service_list,
-        max_class_attribute_id,
-        max_instamce_attribute_id
-        ):
-
-        self.revision = revision
-        self.max_instamce = max_instamce
-        self.number_of_instances = number_of_instances
-        self.attribute_list = attribute_list
-        self.service_list = service_list
-        self.max_class_attribute_id = max_class_attribute_id
-        self.max_instamce_attribute_id = max_instamce_attribute_id
 
 class CIP_Object_Service():
     def __init__(self, service_id, instance_id, fn, name=''):

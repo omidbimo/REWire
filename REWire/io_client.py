@@ -4,22 +4,25 @@ import inspect
 import random
 import logging
 
-import REWire.eip_encapsulation as eip_encap
+from . import eip_encapsulation as eip_encap
+from .objects import object0x0006 as ConnMng
 
-from REWire.common_packet_format import (
+from .common_packet_format import (
     CPF as cpf,
     SequencedAddressItem,
     ConnectedDataItem,
     )
 
-from REWire.rw_packet import Packet
-from REWire.cip_types import *
-from REWire.utils import *
-from REWire.explicit_transport import ExplicitTransport, MessageRouterRequest, MessageRouterResponse
+from .rw_packet import Packet
+from .cip_types import *
+from .utils import *
+from .explicit_transport import (
+    ExplicitTransport,
+    MessageRouterRequest,
+    MessageRouterResponse,
+    )
 
-import REWire.objects.object0x0006 as ConnMng
-
-from REWire.objects.object0x0005 import (
+from .objects.object0x0005 import (
     State,
     TransportClass,
     ProductionTrigger,
@@ -28,17 +31,15 @@ from REWire.objects.object0x0005 import (
     TransportDirection,
     )
 
-from REWire.common import (
+from .common import (
+    CIPGeneralStatus as GSC,
     CIPServiceId,
     CIPObjectId,
     )
 
-from REWire.exceptions import (
-    CIP_GeneralStatusCode as GSC,
-    CIPError,
-    )
-from REWire.unconnected_client import UnconnectedClient
-from REWire.cip_objects import *
+from .exceptions import CIPError
+from .unconnected_client import UnconnectedClient
+from .cip_objects import *
 
 
 logger = logging.getLogger(__name__)
@@ -47,7 +48,7 @@ __all__ = [
         "IOClient",
         ]
 
-class Class2_3_PDU(Packet):
+class Class3PDU(Packet):
     _fields = (
         ("sequence_count", UINT(0)),
         ("payload", BYTES()),

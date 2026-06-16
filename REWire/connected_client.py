@@ -37,12 +37,12 @@ from REWire.objects.object0x0005 import (
 from REWire.common import (
     CIPServiceId,
     CIPObjectId,
+    CIPGeneralStatus as GSC,
     )
 
 from REWire.cip_objects import *
 
 from REWire.exceptions import (
-    CIP_GeneralStatusCode as GSC,
     CIPError,
     )
 from REWire.unconnected_client import UnconnectedClient
@@ -277,7 +277,7 @@ class ConnectedClient(ExplicitTransport):
                 (service_id | 0x80), mr_rsp.service)
                 )
 
-        if mr_rsp.general_status != 0:
+        if mr_rsp.general_status != GSC.SUCCESS:
             raise CIPError(mr_rsp.general_status, mr_rsp.extended_status)
 
         if rsp_dt is not None:

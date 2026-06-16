@@ -57,7 +57,7 @@ class CipherSuite(UINT):
     def __str__(self):
         high_low_bytes = self.to_bytes(2, byteorder='little')
         cipher_id = f"0x{high_low_bytes[0]:02X}{high_low_bytes[1]:02X}"
-        return '<'+cipher_id + ':' + TLS_CIPHER_SUITES.name(int(cipher_id, 16))+'>'
+        return f"<{cipher_id}: {TLS_CIPHER_SUITES(int(cipher_id, 16)).name}>"
 
 class CipherSuites(ARRAY):
     def __init__(self, ciphers=[]):

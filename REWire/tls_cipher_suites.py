@@ -798,5 +798,4 @@ class TLSCipherSuite(REnum):
 
     @property
     def openssl_name(self):
-        print(self.name)
         return self.OpenSslCipherSuiteMapping.get(self)

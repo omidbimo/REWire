@@ -1,24 +1,15 @@
-
-from __future__ import annotations
-
 import socket
 import select
 import time
 import logging
-from collections import namedtuple
+from dataclasses import dataclass
+from OpenSSL import SSL
 
-from contextlib import suppress
-from typing import Any, Optional, Tuple, Union
-
-from OpenSSL import SSL, crypto
-from OpenSSL._util import (
-    ffi as _ffi,
-    lib as _lib)
 #from openssl_psk import patch_context
 #patch_context()
 
-import REWire.utils as util
-from REWire.tls_cipher_suites import *
+from . import utils
+from .tls_cipher_suites import *
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +33,13 @@ DefaultCipherList = [
     TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
     ]
 
-CLIENT_PSK = namedtuple("client_psk", "connection, identity_hint, secret")
+
+@dataclass
+class ClientPSK:
+    connection: SSL.Connection
+    identity: bytes
+    secret: bytes
+
 
 class RWSocket:
     pre_shared_keys = []
@@ -57,10 +54,10 @@ class RWSocket:
         self._server_address = server_address
 
     @staticmethod
-    def client_psk_callback(connection: Connection, identity_hint: bytes):
+    def client_psk_callback(connection: SSL.Connection, psk_id: bytes):
         for client_psk in RWSocket.pre_shared_keys:
             if client_psk.connection == connection:
-                return (client_psk.identity_hint, client_psk.secret)
+                return (client_psk.identity, client_psk.secret)
         return ("", b"")
 
     @property
@@ -87,17 +84,8 @@ class RWSocket:
     @property
     def cipher_name(self):
         return self._socket.get_cipher_name()
-        """
-        cs = _lib.SSL_get_current_cipher(self._socket._ssl)
-        return str(_ffi.string( _lib.SSL_CIPHER_get_name(cs)))
-        """
-    """
-    @property
-    def sessid(self):
-        id = bytes()
-        self._socket._ssl.set_session_id(id)
-        return id
-    """
+
+
 class RW_TCPSocket(RWSocket):
     def __init__(
         self,
@@ -121,7 +109,7 @@ class RW_TCPSocket(RWSocket):
 
     def send(self, payload):
         self._socket.sendall(payload)
-        logger.debug("Data sent\n{}".format(util.hex_dump(payload)))
+        logger.debug("Data sent\n{}".format(utils.hex_dump(payload)))
 
     def receive(self, timeout: float=1.0):
         rsp = []
@@ -135,7 +123,7 @@ class RW_TCPSocket(RWSocket):
                         self._socket.shutdown(socket.SHUT_WR | socket.SHUT_RD)
                         self._socket.close()
                     else:
-                        logger.debug("Data received\n{}".format(util.hex_dump(data)))
+                        logger.debug("Data received\n{}".format(utils.hex_dump(data)))
                         rsp.append((data, self._socket.getpeername(), time.time()))
                 except SSL.WantReadError:
                     continue
@@ -144,6 +132,7 @@ class RW_TCPSocket(RWSocket):
 
     def close(self):
         self._socket.close()
+
 
 class RW_TLSSocket(RW_TCPSocket):
     def __init__(
@@ -163,7 +152,6 @@ class RW_TLSSocket(RW_TCPSocket):
         ssl_ctx.set_verify(SSL.VERIFY_NONE)
         ssl_ctx.set_options(SSL.OP_SINGLE_ECDH_USE)
 
-
         if ciphers:
             cipher_string = ":".join(TLSCipherSuite(cipher).openssl_name for cipher in ciphers)
         else:
@@ -180,7 +168,7 @@ class RW_TLSSocket(RW_TCPSocket):
         self._socket = SSL.Connection(ssl_ctx, self._socket)
 
         if psk and psk[0] != "":
-            RWSocket.pre_shared_keys.append(CLIENT_PSK(self._socket, psk[0], psk[1]))
+            RWSocket.pre_shared_keys.append(ClientPSK(self._socket, psk[0], psk[1]))
 
         self._socket.set_connect_state()
 
@@ -201,6 +189,7 @@ class RW_TLSSocket(RW_TCPSocket):
     def close(self):
         self._socket.shutdown()
         self._socket.close()
+
 
 class RW_UDPSocket(RWSocket):
     def __init__(
@@ -224,7 +213,7 @@ class RW_UDPSocket(RWSocket):
 
     def send(self, payload) -> None:
         self._socket.sendto(payload, self._server_address)
-        logger.debug("Data sent\n{}".format(util.hex_dump(payload)))
+        logger.debug("Data sent\n{}".format(utils.hex_dump(payload)))
 
     def receive(self, timeout: float=2.0):
         rsp = []
@@ -234,7 +223,7 @@ class RW_UDPSocket(RWSocket):
                 self._socket.settimeout(timeout - (time.time() - t_start))
                 data, addr = self._socket.recvfrom(65535)
                 rsp.append((bytearray(data), addr, time.time()))
-                logger.debug("Data received\n{}".format(util.hex_dump(data)))
+                logger.debug("Data received\n{}".format(utils.hex_dump(data)))
                 if not self._broadcast:
                     break
             except socket.timeout:
@@ -251,6 +240,7 @@ class RW_UDPSocket(RWSocket):
     @property
     def is_broadcast(self):
         return True if self._socket.getsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST) > 0 else False
+
 
 class RW_DTLSSocket(RW_UDPSocket):
     def __init__(
@@ -314,7 +304,7 @@ class RW_DTLSSocket(RW_UDPSocket):
 
     def send(self, payload):
         self._socket.sendall(payload)
-        logger.debug("Data sent\n{}".format(util.hex_dump(payload)))
+        logger.debug("Data sent\n{}".format(utils.hex_dump(payload)))
 
     def receive(self, timeout: float=1.0):
         rsp = []
@@ -326,7 +316,7 @@ class RW_DTLSSocket(RW_UDPSocket):
                 self._socket.shutdown(socket.SHUT_WR | socket.SHUT_RD)
                 self._socket.close()
             else:
-                logger.debug("Data received\n{}".format(util.hex_dump(data)))
+                logger.debug("Data received\n{}".format(utils.hex_dump(data)))
                 rsp.append((data, self._socket.getpeername(), time.time()))
         return rsp
 
@@ -339,6 +329,7 @@ class RW_DTLSSocket(RW_UDPSocket):
         if where & SSL.SSL_CB_HANDSHAKE_DONE:
             self.handshake_done = True
 
+
 def UDP(host_ip, server_ip, timeout: float=1.0, security=False, **kwargs):
         if security is True:
             ciphers = kwargs.get("ciphers", None)
@@ -348,6 +339,7 @@ def UDP(host_ip, server_ip, timeout: float=1.0, security=False, **kwargs):
         return RW_UDPSocket((host_ip, 0), (server_ip, 44818), timeout=timeout,
                 broadcast=True if server_ip=="255.255.255.255" else False
                 )
+
 
 def TCP(host_ip, server_ip, timeout: float=1.0, security=False, **kwargs):
         if security is True:

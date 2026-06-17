@@ -38,7 +38,6 @@ from .common import (
 
 from .exceptions import CIPError
 from .unconnected_client import UnconnectedClient
-from .cip_objects import *
 
 
 logger = logging.getLogger(__name__)
@@ -119,7 +118,7 @@ class IOClient:
         else:
             self.session = self.ucc
 
-        cm = CIP_Object(self.ucc, 6)
+        cm = CIPObject(self.ucc, 6)
 
         if self.o2t_size <= 511 and self.t2o_size <= 511:
             o2t_conn_params = ConnMng.NetworkConnectionParameters(
@@ -213,7 +212,7 @@ class IOClient:
         while (2**tick_time)*255 < self.ucmm_timeout:
             tick_time += 1
 
-        cm = CIP_Object(self.ucc, 6)
+        cm = CIPObject(self.ucc, 6)
         cm.forward_close(tick_time,
                          self.ucmm_timeout//(2**tick_time),
                          self.connection_serial_number,

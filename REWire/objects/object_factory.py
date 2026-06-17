@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.INFO,
     format='%(asctime)s - %(name)s.%(levelname)-8s %(message)s')
 logger = logging.getLogger(__name__)
 
-class CIP_ObjectFactory:
+class CIPObjectFactory:
 
     def __new__(cls, client, class_id, revision=None):
         class_name = "Object" + "0x{:04X}".format(class_id)#cls.obj_name_table.get(class_id, None)

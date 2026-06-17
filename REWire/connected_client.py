@@ -39,7 +39,7 @@ from .common import (
     CIPGeneralStatus as GSC,
     )
 
-from .cip_objects import *
+from .objects.object_factory import CIPObjectFactory as CIPObject
 from .exceptions import CIPError
 from .unconnected_client import UnconnectedClient
 from .cip_types import *
@@ -138,7 +138,7 @@ class ConnectedClient(ExplicitTransport):
 
         self.session.add_owner(self)
         ucc = UnconnectedClient(self.session)
-        cm = CIP_Object(ucc, 6)
+        cm = CIPObject(ucc, 6)
 
         o2t_conn_params = NetworkConnectionParameters(
             connection_size = self.o2t_size,
@@ -221,7 +221,7 @@ class ConnectedClient(ExplicitTransport):
             tick_time += 1
 
         ucc = UnconnectedClient(self.session)
-        cm = CIP_Object(ucc, 6)
+        cm = CIPObject(ucc, 6)
 
         cm.forward_close(tick_time,
                          self.ucmm_timeout//(2**tick_time),

@@ -1,8 +1,8 @@
-from REWire.rw_packet import Packet
-from REWire.cip_types import *
-from REWire.cip_object import *
-from REWire.common     import CIP_class_attributes, Revision, CIPServiceId
-from REWire.rw_enum import REnum
+from ..rw_packet import Packet
+from ..cip_types import *
+from ..common    import CIP_class_attributes, Revision, CIPServiceId
+from ..rw_enum   import REnum
+from .cip_object import *
 
 class State(REnum):
     FACTORY_DEFAULT_CONFIGURATION = 0

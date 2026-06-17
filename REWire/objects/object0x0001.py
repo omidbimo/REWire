@@ -1,7 +1,7 @@
-from REWire.rw_packet import Packet
-from REWire.cip_types import *
-from REWire.cip_object import *
-from REWire.common import CIP_class_attributes, Revision, CIPServiceId
+from ..rw_packet import Packet
+from ..cip_types import *
+from ..common import CIP_class_attributes, Revision, CIPServiceId
+from .cip_object import *
 
 class Object0x0001_Services(CIPServiceId):
     FLASH_LEDS = 0x4B

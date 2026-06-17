@@ -1,6 +1,6 @@
-from REWire.rw_packet import Packet
-from REWire.cip_types import *
-from REWire.cip.common import *
+from ..rw_packet import Packet
+from ..cip_types import *
+from ..cip.common import *
 
 class Object0x00F5_Rev4(CIPObjectCommon):
     class_id = 0xF5

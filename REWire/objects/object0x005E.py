@@ -1,13 +1,15 @@
-from REWire.cip_types import Packet
-from REWire.cip_types import *
-from REWire.cip_object import *
-from REWire.common import CIP_class_attributes, Revision, CIPServiceId
-from REWire.rw_enum import REnum
-from REWire.tls_cipher_suites import *
-
 import string
 import random
 from os import urandom
+
+from ..cip_types import Packet
+from ..cip_types import *
+from ..common import CIP_class_attributes, Revision, CIPServiceId
+from ..rw_enum import REnum
+from ..tls_cipher_suites import *
+from .cip_object import *
+
+
 
 class State(REnum):
     FACTORY_DEFAULT_CONFIGURATION = 0

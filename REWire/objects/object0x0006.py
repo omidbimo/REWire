@@ -1,11 +1,13 @@
-from REWire.rw_packet import Packet
-from REWire.cip_types import *
-from REWire.cip_object import *
-from REWire.common     import *
-from REWire.rw_enum import REnum
-from REWire.objects.object0x0005 import TransportClassTrigger
 import logging
 logger = logging.getLogger(__name__)
+
+from ..rw_packet import Packet
+from ..cip_types import *
+from .cip_object import *
+from ..common    import *
+from ..rw_enum import REnum
+from .object0x0005 import TransportClassTrigger
+
 
 class Object0x0006_Services(CIPServiceId):
     FORWARD_CLOSE           = 0x4E

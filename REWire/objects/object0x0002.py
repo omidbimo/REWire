@@ -1,13 +1,15 @@
-from REWire.cip_types import *
-from REWire.cip_object import *
-from REWire.common     import *
-from REWire.unconnected_client import UnconnectedClient
-from REWire.explicit_transport import (
+import logging
+logger = logging.getLogger(__name__)
+
+from ..cip_types import *
+from ..common     import *
+from ..unconnected_client import UnconnectedClient
+from ..explicit_transport import (
         MessageRouterRequest,
         MessageRouterResponse,
         )
-import logging
-logger = logging.getLogger(__name__)
+
+from .cip_object import *
 
 
 class Object0x0002_Services(CIPServiceId):

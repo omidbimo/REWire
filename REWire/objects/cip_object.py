@@ -3,7 +3,7 @@ logging.basicConfig(level=logging.INFO,
     format='%(asctime)s - %(name)s.%(levelname)-8s %(message)s')
 logger = logging.getLogger(__name__)
 
-from .common import CIPServiceId
+from ..common import CIPServiceId
 
 
 __all__ = [

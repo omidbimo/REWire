@@ -1,12 +1,12 @@
-from REWire.rw_packet import Packet
-from REWire.cip_types import *
-from REWire.cip_object import *
-from REWire.common     import *
-from REWire.rw_enum import REnum
 
-from time import sleep
 import logging
 logger = logging.getLogger(__name__)
+
+from ..rw_packet import Packet
+from ..cip_types import *
+from ..common    import *
+from ..rw_enum   import REnum
+from .cip_object import *
 
 
 class Object0x0037_Services(CIPServiceId):

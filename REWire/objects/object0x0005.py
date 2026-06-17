@@ -1,8 +1,8 @@
-from REWire.rw_packet import Packet
-from REWire.rw_enum import REnum
-from REWire.cip_types import *
-from REWire.cip_object import *
-from REWire.common import *
+from ..rw_packet import Packet
+from ..rw_enum import REnum
+from ..cip_types import *
+from ..common import *
+from .cip_object import *
 
 class Object0x0005_Services(CIPServiceId):
     pass

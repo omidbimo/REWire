@@ -179,7 +179,7 @@ class CertificatesPath(ARRAY):
         return super().dissect(bstream, PaddedEPATH, entry_count)
 
 
-class Object0x005E_Rev9(CIP_ObjectCommon):
+class Object0x005E_Rev9(CIPObjectCommon):
     class_id = 0x5E
     class_name = 'EtherNetIP Security Object'
     services = Object0x005E_Services

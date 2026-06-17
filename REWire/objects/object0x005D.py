@@ -28,7 +28,7 @@ class ObjectAuthorization(Packet):
         )
 
 
-class Object0x005D_Rev4(CIP_ObjectCommon):
+class Object0x005D_Rev4(CIPObjectCommon):
     class_id = 0x5D
     class_name = 'CIP Security Object'
     services = Object0x005D_Services

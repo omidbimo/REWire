@@ -2,7 +2,7 @@ from REWire.rw_packet import Packet
 from REWire.cip_types import *
 from REWire.cip.common import *
 
-class Object0x00F5_Rev4(CIP_ObjectCommon):
+class Object0x00F5_Rev4(CIPObjectCommon):
     class_id = 0xF5
     class_name = "TCP/IP Interface Object"
     services = Object0x00F5_Services

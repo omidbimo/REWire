@@ -9,7 +9,7 @@ class Object0x0063_Services(CIPServiceId):
     SET_RULES = 0x4B
 
 
-class Object0x0063_Rev1(CIP_ObjectCommon):
+class Object0x0063_Rev1(CIPObjectCommon):
     class_id = 0x63
     class_name = "Ingress Egress Object"
     services = Object0x0063_Services

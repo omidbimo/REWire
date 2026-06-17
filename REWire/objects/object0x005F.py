@@ -65,7 +65,7 @@ class CertificateList(ARRAY):
         entry_count, bstream = USINT.dissect(bstream)
         return super().dissect(bstream, CertificateNameAndPath, entry_count)
 
-class Object0x005F_Rev3(CIP_ObjectCommon):
+class Object0x005F_Rev3(CIPObjectCommon):
     class_id = 0x5F
     class_name = 'Certificate Management Object'
     services = Object0x005F_Services

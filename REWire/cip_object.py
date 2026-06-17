@@ -7,17 +7,17 @@ from .common import CIPServiceId
 
 
 __all__ = [
-    'CIP_ObjectCommon',
+    'CIPObjectCommon',
     ]
 
 class Attributes():
     pass
 
-class CIP_ObjectMeta(type):
+class CIPObjectMeta(type):
 
     def __new__(cls, name, bases, dict):
 
-        new_ = super(CIP_ObjectMeta, cls).__new__(cls, name, bases, dict)
+        new_ = super().__new__(cls, name, bases, dict)
 
         attr_info = {}
         slots = []
@@ -30,12 +30,13 @@ class CIP_ObjectMeta(type):
 
         dict['__slots__'] = slots
 
-        new_ = super(CIP_ObjectMeta, cls).__new__(cls, name, bases, dict)
+        new_ = super().__new__(cls, name, bases, dict)
 
         return new_
 
-class CIP_ObjectCommon(metaclass = CIP_ObjectMeta):
+class CIPObjectCommon(metaclass = CIPObjectMeta):
     __slots__ = ()
+
     def __init__(self, client):
         self.client = client
         self.class_attr = Attributes()
@@ -87,9 +88,9 @@ class CIP_ObjectCommon(metaclass = CIP_ObjectMeta):
         for attribute_id in gaa_attr_id_list:
             if len(gaa) == 0:
                 break
-            attr = self.get_attr_type(instance_id, attribute_id)()
-            gaa = attr.dissect(gaa)
-            gaa_dict.update({attribute_id: attr})
+            attr_dt = self.get_attr_type(instance_id, attribute_id)()
+            val, gaa = attr_dt.dissect(gaa)
+            gaa_dict.update({attribute_id: val})
 
         if len(gaa) != 0:
             raise Exception("Unexpected {} bytes excess data in the get_attributes_all response.".format(len(gaa)))

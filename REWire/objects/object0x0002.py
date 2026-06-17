@@ -51,7 +51,7 @@ class ObjectList(Packet):
     #                      "    File name: \"{}\"".format(entry.file_name))
     #                      for entry in self._entries)
 
-class Object0x0002_Rev1(CIP_ObjectCommon):
+class Object0x0002_Rev1(CIPObjectCommon):
     class_id = 0x02
     class_name = "Message Router Object"
     services = Object0x0002_Services

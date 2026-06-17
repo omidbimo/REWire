@@ -59,7 +59,7 @@ class Class3PDU(Packet):
         super(Class3PDU, self).__init__()
         self.payload = BYTES(payload)
 
-class Object0x0005_Rev2(CIP_ObjectCommon):
+class Object0x0005_Rev2(CIPObjectCommon):
     class_id = 0x05
     class_name = "Connection Object"
     services = Object0x0005_Services

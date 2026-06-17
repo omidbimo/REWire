@@ -208,7 +208,7 @@ class FileTransferContext():
                )
 
 
-class Object0x0037_Rev3(CIP_ObjectCommon):
+class Object0x0037_Rev3(CIPObjectCommon):
     class_id = 0x37
     class_name = "File Object"
     services = Object0x0037_Services
@@ -312,8 +312,8 @@ class Object0x0037_Rev3(CIP_ObjectCommon):
             transfer_session.file_data += transfer_session.fragment_data
             transfer_session.transfer_number = (transfer_session.transfer_number + 1) & 0xFF
 
-        transfer_session.checksum.unpack(transfer_session.fragment_data[-2:])
-        transfer_session.file_data = transfer_session.file_data[:-2]
+        transfer_session.file_data = BYTES.unpack(transfer_session.file_data[:-2])
+        transfer_session.checksum = UINT.unpack(transfer_session.fragment_data[-2:])
 
         if self.file_checksum(transfer_session.file_data) != transfer_session.checksum:
             raise Exception("Unexpected Checksum! Expected:{}, got:{} ".format(

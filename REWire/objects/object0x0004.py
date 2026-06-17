@@ -8,7 +8,7 @@ class Object0x0004_Services(CIPServiceId):
     SET_RULES = 0x4B
 
 
-class Object0x0004_Rev2(CIP_ObjectCommon):
+class Object0x0004_Rev2(CIPObjectCommon):
     class_id = 0x04
     class_name = "Assembly Object"
     services = Object0x0004_Services

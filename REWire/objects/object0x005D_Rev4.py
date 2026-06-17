@@ -1,6 +1,6 @@
 from ..rw_packet import Packet
 from ..cip_types import *
-from ..common    import CIP_class_attributes, Revision, CIPServiceId
+from ..common    import CIPClassAttributes, Revision, CIPServiceId
 from ..rw_enum   import REnum
 from .cip_object import *
 
@@ -28,12 +28,13 @@ class ObjectAuthorization(Packet):
         )
 
 
-class Object0x005D_Rev4(CIPObjectCommon):
+class Object0x005D(CIPObjectCommon):
     class_id = 0x5D
+    revision = 4
     class_name = 'CIP Security Object'
     services = Object0x005D_Services
 
-    _class_attributes = CIP_class_attributes
+    _class_attributes = CIPClassAttributes
 
     _instance_attributes = (
         (1, 'state',                          USINT),

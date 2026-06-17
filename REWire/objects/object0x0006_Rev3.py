@@ -6,7 +6,7 @@ from ..cip_types import *
 from .cip_object import *
 from ..common    import *
 from ..rw_enum import REnum
-from .object0x0005 import TransportClassTrigger
+from .object0x0005_Rev2 import TransportClassTrigger
 
 
 class Object0x0006_Services(CIPServiceId):
@@ -150,11 +150,11 @@ class ConnectionTriad(Packet):
         )
 
 
-class Object0x0006_Rev3(CIPObjectCommon):
+class Object0x0006(CIPObjectCommon):
     class_id = 0x06
     class_name = "Connection Manager Object"
     services = Object0x0006_Services
-    _class_attributes = CIP_class_attributes
+    _class_attributes = CIPClassAttributes
 
     _instance_attributes = (
         (1,  "open_requests",                           UINT),

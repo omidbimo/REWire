@@ -208,12 +208,13 @@ class FileTransferContext():
                )
 
 
-class Object0x0037_Rev3(CIPObjectCommon):
+class Object0x0037(CIPObjectCommon):
     class_id = 0x37
+    revision = 3
     class_name = "File Object"
     services = Object0x0037_Services
 
-    _class_attributes = CIP_class_attributes + (
+    _class_attributes = CIPClassAttributes + (
         (32, "directory", FileDirectory),
         )
 

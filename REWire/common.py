@@ -178,7 +178,7 @@ class Revision(Packet):
         return '{}.{}'.format(self.major, self.minor)
 
 
-CIP_class_attributes = (
+CIPClassAttributes = (
     (1, 'revision',                   UINT),
     (2, 'max_instamce',               UINT),
     (3, 'number_of_instances',        UINT),

@@ -3,7 +3,6 @@ logger = logging.getLogger(__name__)
 
 from ..cip_types import *
 from ..common     import *
-from ..unconnected_client import UnconnectedClient
 from ..explicit_transport import (
         MessageRouterRequest,
         MessageRouterResponse,
@@ -53,12 +52,13 @@ class ObjectList(Packet):
     #                      "    File name: \"{}\"".format(entry.file_name))
     #                      for entry in self._entries)
 
-class Object0x0002_Rev1(CIPObjectCommon):
+class Object0x0002(CIPObjectCommon):
     class_id = 0x02
+    revision = 1
     class_name = "Message Router Object"
     services = Object0x0002_Services
 
-    _class_attributes = CIP_class_attributes
+    _class_attributes = CIPClassAttributes
 
     _instance_attributes = (
         (1,  "object_list",         ObjectList),
@@ -69,8 +69,7 @@ class Object0x0002_Rev1(CIPObjectCommon):
 
     def send_receive_fragment(self, embedded_service_id, embedded_class_id,
             embedded_instance_id, embedded_attribute_id=None, embedded_data=b'', rsp_dt=None):
-        if isinstance(self.client, UnconnectedClient):
-            logger.wrning("send_receive_fragment service is not possible with unconnected requests!")
+
         embed_req = MessageRouterRequest(service=embedded_service_id)
         embed_req.request_path.add_application_path(embedded_class_id,
                 embedded_instance_id, embedded_attribute_id)

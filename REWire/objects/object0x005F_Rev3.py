@@ -1,6 +1,6 @@
 from ..rw_packet import Packet
 from ..cip_types import *
-from ..common import CIP_class_attributes, Revision, CIPServiceId
+from ..common import CIPClassAttributes, Revision, CIPServiceId
 from ..rw_enum import REnum
 from .cip_object import *
 
@@ -67,12 +67,13 @@ class CertificateList(ARRAY):
         entry_count, bstream = USINT.dissect(bstream)
         return super().dissect(bstream, CertificateNameAndPath, entry_count)
 
-class Object0x005F_Rev3(CIPObjectCommon):
+class Object0x005F(CIPObjectCommon):
     class_id = 0x5F
+    revision = 3
     class_name = 'Certificate Management Object'
     services = Object0x005F_Services
 
-    _class_attributes = CIP_class_attributes + (
+    _class_attributes = CIPClassAttributes + (
         (8,  'capability_flags', DWORD),
         (9,  'certificate_list', CertificateList),
         (10, 'certificate_encodings_flag', DWORD),

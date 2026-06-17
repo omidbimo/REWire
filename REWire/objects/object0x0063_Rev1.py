@@ -8,12 +8,13 @@ class Object0x0063_Services(CIPServiceId):
     SET_RULES = 0x4B
 
 
-class Object0x0063_Rev1(CIPObjectCommon):
+class Object0x0063(CIPObjectCommon):
     class_id = 0x63
+    revision = 1
     class_name = "Ingress Egress Object"
     services = Object0x0063_Services
 
-    _class_attributes = CIP_class_attributes + (
+    _class_attributes = CIPClassAttributes + (
         (8, "ingress_rules_tcp_ports_supported", BYTES),
         (9, "ingress_rules_udp_ports_supported", BYTES),
         (10, "max_buffer_size_for_rules",        UDINT),
@@ -32,4 +33,4 @@ class Object0x0063_Rev1(CIPObjectCommon):
         else:
             all_gga_attr_list = [1, 2]
 
-        return super(Object0x0063, self).get_attributes_all(instance_id, all_gga_attr_list)
+        return super().get_attributes_all(instance_id, all_gga_attr_list)

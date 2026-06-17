@@ -39,7 +39,7 @@ from .common import (
     CIPGeneralStatus as GSC,
     )
 
-from .objects.object_factory import CIPObjectFactory as CIPObject
+from .objects.cip_object import CIPObjectFactory as CIPObject
 from .exceptions import CIPError
 from .unconnected_client import UnconnectedClient
 from .cip_types import *

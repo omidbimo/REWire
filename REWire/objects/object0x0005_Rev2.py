@@ -63,7 +63,7 @@ class Object0x0005_Rev2(CIPObjectCommon):
     class_id = 0x05
     class_name = "Connection Object"
     services = Object0x0005_Services
-    _class_attributes = CIP_class_attributes
+    _class_attributes = CIPClassAttributes
     connection_request_error_count = 0
     safety_connection_counters = 0
 

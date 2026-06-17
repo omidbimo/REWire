@@ -4,7 +4,7 @@ from os import urandom
 
 from ..cip_types import Packet
 from ..cip_types import *
-from ..common import CIP_class_attributes, Revision, CIPServiceId
+from ..common import CIPClassAttributes, Revision, CIPServiceId
 from ..rw_enum import REnum
 from ..tls_cipher_suites import *
 from .cip_object import *
@@ -181,12 +181,13 @@ class CertificatesPath(ARRAY):
         return super().dissect(bstream, PaddedEPATH, entry_count)
 
 
-class Object0x005E_Rev9(CIPObjectCommon):
+class Object0x005E(CIPObjectCommon):
     class_id = 0x5E
+    revision = 9
     class_name = 'EtherNetIP Security Object'
     services = Object0x005E_Services
 
-    _class_attributes = CIP_class_attributes + (
+    _class_attributes = CIPClassAttributes + (
         (8, 'number_of_psks_supported', UINT),
         (9, 'psk_usages_supported', BYTE),
         )

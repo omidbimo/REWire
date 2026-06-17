@@ -1,3 +1,5 @@
+import sys
+
 import logging
 logging.basicConfig(level=logging.INFO,
     format='%(asctime)s - %(name)s.%(levelname)-8s %(message)s')
@@ -95,3 +97,22 @@ class CIPObjectCommon(metaclass = CIPObjectMeta):
         if len(gaa) != 0:
             raise Exception("Unexpected {} bytes excess data in the get_attributes_all response.".format(len(gaa)))
         return gaa_dict
+
+class CIPObjectFactory:
+
+    def __new__(cls, client, class_id, revision=None):
+        class_name = f"Object0x{class_id:04X}" # Class names should startin with big capitals
+        module_name = f"object0x{class_id:04X}"
+        if revision is not None:
+            module_name += f"_Rev{revision}"
+            logger.debug(f"Creating an instance of: {class_name} revision{revision}")
+        else:
+            logger.debug(f"Creating an instance of: {class_name}")
+
+        try:
+            # package.__init__ has already registered all revisions of the object modules inside the sys.modules
+            module = sys.modules[f"{__package__}.{module_name}"]
+            return getattr(module, class_name)(client)
+        except Exception as err:
+            print(err)
+            raise NotImplementedError(f"No Implementations for {class_name} was found!")

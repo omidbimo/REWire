@@ -19,15 +19,6 @@ from OpenSSL._util import (
 
 import REWire.utils as util
 from REWire.tls_cipher_suites import *
-from REWire.tls_cipher_suites import OpenSSL_cipher_mapping
-
-DEFAULT_CIPHER_SUITES = [
-    TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,
-    TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,
-    TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-    TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-    TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
-    ]
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +30,16 @@ __all__ = [
     "RW_TLSSocket",
     "RW_UDPSocket",
     "RW_DTLSSocket",
-    "DEFAULT_CIPHER_SUITES",
+    "DefaultCipherList",
+    ]
+
+
+DefaultCipherList = [
+    TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,
+    TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,
+    TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+    TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+    TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
     ]
 
 CLIENT_PSK = namedtuple("client_psk", "connection, identity_hint, secret")
@@ -163,13 +163,16 @@ class RW_TLSSocket(RW_TCPSocket):
         ssl_ctx.set_verify(SSL.VERIFY_NONE)
         ssl_ctx.set_options(SSL.OP_SINGLE_ECDH_USE)
 
-        if ciphers and ciphers != []:
-            cipher_string = ":".join(OpenSSL_cipher_mapping.get(cipher) for cipher in ciphers)
 
-            if "NULL" in cipher_string:
-                cipher_string += ":@SECLEVEL=0"
-                logger.warning("Security warning! SSL security set to lowest level in order to enable a NULL cipher suite.")
-            ssl_ctx.set_cipher_list(cipher_string)
+        if ciphers:
+            cipher_string = ":".join(TLSCipherSuite(cipher).openssl_name for cipher in ciphers)
+        else:
+            cipher_string = ":".join(TLSCipherSuite(cipher).openssl_name for cipher in DefaultCipherList)
+
+        if "NULL" in cipher_string:
+            cipher_string += ":@SECLEVEL=0"
+            logger.warning("SSL security set to lowest level due the using of NULL cipher suite.")
+        ssl_ctx.set_cipher_list(cipher_string)
 
         if psk and psk[0] != "":
             ssl_ctx.set_psk_client_callback(RWSocket.client_psk_callback)
@@ -269,12 +272,15 @@ class RW_DTLSSocket(RW_UDPSocket):
         ssl_ctx.set_verify(SSL.VERIFY_NONE)
         ssl_ctx.set_options(SSL.OP_SINGLE_ECDH_USE)
 
-        if ciphers and ciphers != []:
-            cipher_string = ":".join(OpenSSL_cipher_mapping.get(cipher) for cipher in ciphers)
-            if "NULL" in cipher_string:
-                cipher_string += ":@SECLEVEL=0"
-                logger.warning("Security warning! SSL security set to lowest level in order to enable a NULL cipher suite.")
-            ssl_ctx.set_cipher_list(cipher_string)
+        if ciphers:
+            cipher_string = ":".join(TLSCipherSuite(cipher).openssl_name for cipher in ciphers)
+        else:
+            cipher_string = ":".join(TLSCipherSuite(cipher).openssl_name for cipher in DefaultCipherList)
+
+        if "NULL" in cipher_string:
+            cipher_string += ":@SECLEVEL=0"
+            logger.warning("SSL security set to lowest level due the using of NULL cipher suite.")
+        ssl_ctx.set_cipher_list(cipher_string)
 
         if psk and psk[0] != "":
             ssl_ctx.set_psk_client_callback(RWSocket.client_psk_callback)

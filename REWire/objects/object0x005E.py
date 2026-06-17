@@ -28,26 +28,6 @@ class PSK_Usage(REnum):
     CLIENT = 1
     ANY_USAGE = 2
 
-"""
-ETHERNETIP_SECURITY_DEFAULT_CIPHERS = [
-    TLS_RSA_WITH_AES_128_CBC_SHA256,
-    TLS_RSA_WITH_AES_256_CBC_SHA256,
-    TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,
-    TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,
-    TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-    TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-    TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
-    ]
-"""
-ETHERNETIP_SECURITY_DEFAULT_CIPHERS = [
-    "TLS-RSA-WITH-AES-128-CBC-SHA256",
-    "TLS-RSA-WITH-AES-256-CBC-SHA256",
-    "TLS-ECDHE-ECDSA-WITH-AES-256-CBC-SHA384",
-    "TLS-ECDHE-ECDSA-WITH-AES-128-CBC-SHA256",
-    "TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256",
-    "TLS-ECDHE-ECDSA-WITH-AES-256-GCM-SHA384",
-    "TLS-ECDHE-ECDSA-WITH-CHACHA20-POLY1305-SHA256",
-    ]
 
 class CipherSuite(UINT):
 
@@ -57,7 +37,7 @@ class CipherSuite(UINT):
     def __str__(self):
         high_low_bytes = self.to_bytes(2, byteorder='little')
         cipher_id = f"0x{high_low_bytes[0]:02X}{high_low_bytes[1]:02X}"
-        return f"<{cipher_id}: {TLS_CIPHER_SUITES(int(cipher_id, 16)).name}>"
+        return f"<{cipher_id}: {TLSCipherSuite(int(cipher_id, 16)).name}>"
 
 class CipherSuites(ARRAY):
     def __init__(self, ciphers=[]):

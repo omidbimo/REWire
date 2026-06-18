@@ -37,8 +37,8 @@ class MessageRouterResponse(Packet):
 class ExplicitTransport:
 
     def cip_service(self, service_id, class_id, instance_id,
-            attribute_id=None, ekey: ELECTRONIC_KEY_SEGMENT=None, data=BYTES(),
-            timeout=5000, rsp_dt=None):
+                    attribute_id=None, ekey: ELECTRONIC_KEY_SEGMENT=None,
+                    data=BYTES(), timeout=5000, rsp_dt=None):
 
         logger.debug("CIP service:0x{:X}, Class:0x{:X}, Instance:{}{}".format(
             service_id, class_id, instance_id, ", Attribute:{}".format(attribute_id) if attribute_id is not None else ""))
@@ -46,7 +46,10 @@ class ExplicitTransport:
         self.cip_service_send_request(service_id, class_id, instance_id,
                 attribute_id, data, ekey=ekey)
 
-        rsp = self.cip_service_rcv_response(service_id, rsp_dt=rsp_dt, timeout=timeout)
+        rsp = self.cip_service_rcv_response(service_id, timeout=timeout)
+
+        if rsp_dt is not None:
+            return rsp_dt.unpack(rsp)
         return rsp
 
     def get_attributes_all(self, class_id, instance_id,

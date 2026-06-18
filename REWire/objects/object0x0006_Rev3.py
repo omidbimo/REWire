@@ -217,11 +217,15 @@ class Object0x0006(CIPObjectCommon):
             connection_path = connection_path,
             )
 
-        cip_data = self.client.cip_service(self.services.FORWARD_OPEN,
-                    CIPObjectId.CONNECTION_MANAGER, instance_id = 1,
-                    data = fwd_open_req, timeout=5000)
-
-        fwd_open_rsp = ForwardOpenResponse().unpack(cip_data)
+        rsp = self.client.cip_service(self.services.FORWARD_OPEN, CIPObjectId.CONNECTION_MANAGER,
+                                      instance_id=1, data=fwd_open_req, timeout=5000)
+        # The response may contain only a MR response or additionally two
+        # Socket Address Info items if the ForwardOpen is meant to open a Class 0/1 connection.
+        if isinstance(rsp, tuple):
+            fwd_open_rsp = ForwardOpenResponse.unpack(rsp[0])
+            # TODO: handle the socket address info items
+        else:
+            fwd_open_rsp = ForwardOpenResponse.unpack(rsp)
 
         """
         take the connection IDs unconditionally from the FwdOpenResponse.

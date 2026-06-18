@@ -2,10 +2,12 @@ from time import time
 import inspect
 import random
 import logging
+logger = logging.getLogger(__name__)
 
 from . import eip_encapsulation as eip_encap
 from .rw_packet import Packet
 from .common_packet_format import (
+        CPF,
         CPFId,
         NullAddressItem,
         UnconnectedDataItem,
@@ -35,8 +37,14 @@ from .common import (
 from .exceptions import CIPError
 from .cip_types import *
 
-logger = logging.getLogger(__name__)
 
+
+class UCMMPacket(Packet):
+    _fields = (
+        ('item_count',   UINT(2)),
+        ('address_item', NullAddressItem()),
+        ('data_item',    UnconnectedDataItem()),
+        )
 
 class DTLS_UnconnectedEncapPacket(Packet):
     _fields = (
@@ -92,29 +100,49 @@ class UnconnectedClient(ExplicitTransport):
             logger.warning(inspect.currentframe().f_code.co_name +
                 "Request ({} bytes) longer than maximum Message-Router size (504 bytes).".format(len(mr_req.pack())))
 
+        ucmm_req = UCMMPacket(data_item=UnconnectedDataItem(data=mr_req.pack(), length=len(mr_req.pack())))
         eip_encap.send_rr_data( self.session.socket,
                                 self.session.handle,
                                 sender_context = self.session.seq_number,
-                                payload = mr_req.pack(),
+                                payload = ucmm_req.pack(),
                                 )
 
+    def cip_service_rcv_response(self, service_id, timeout=3000):
+        """
 
-    def cip_service_rcv_response(self, service_id, timeout=3000, rsp_dt=None):
+        Note: If there are any SocketAddress items in the response,
+        """
         rsp, _ = eip_encap.rcv_rr_data(self.session.socket, self.session.seq_number, timeout)
+        rsp_cpf = CPF.unpack(rsp)
 
-        mr_rsp = MessageRouterResponse.unpack(rsp)
+        rsp_data_item = rsp_cpf.get_item(CPFId.UNCONNECTED_DATA)
+        if rsp_data_item:
+            if rsp_data_item.type_id != CPFId.UNCONNECTED_DATA:
+                raise Exception("Unexpected CPF in SendRRData response! " +
+                            f"expected:{CPFId.UNCONNECTED_DATA}, got:{rsp_data_item.type_id}")
 
-        if mr_rsp.service != (service_id | 0x80):
+            if rsp_data_item.length != len(rsp_data_item.data):
+                raise Exception("Unexpected data length in Unconnected message! " +
+                            f"expected:{rsp_data_item.length}, got:{len(rsp_data_item.data)}")
+
+            rsp_mr = MessageRouterResponse.unpack(rsp_data_item.data)
+        else:
+            raise Exception("No CPF UnconnectedDataItem in the response!")
+
+        if rsp_mr.service != (service_id | 0x80):
             raise Exception("Unexpected service ID in response!" +
-                            f"expected:{(service_id | 0x80)}, got:{mr_rsp.service}")
+                            f"expected:{(service_id | 0x80)}, got:{rsp_mr.service}")
 
-        if mr_rsp.general_status != 0:
-            raise CIPError(mr_rsp.general_status, mr_rsp.extended_status)
+        if rsp_mr.general_status != 0:
+            raise CIPError(rsp_mr.general_status, rsp_mr.extended_status)
 
-        if rsp_dt is not None:
-            return rsp_dt.unpack(mr_rsp.response_data)
+        if len(rsp_cpf) > 2:
+            return (rsp_mr.response_data,
+                    rsp_cpf.get_item(CPFId.SOCKADDR_INFO_O2T),
+                    rsp_cpf.get_item(CPFId.SOCKADDR_INFO_T2O),
+                    )
 
-        return mr_rsp.response_data
+        return rsp_mr.response_data
 
 
 class DTLS_Client(ExplicitTransport):
@@ -172,16 +200,16 @@ class DTLS_Client(ExplicitTransport):
                                 "expected:{}, got:{}".format(dtls_ucm.length,
                                                              len(dtls_ucm.unconn_msg_type) + len(dtls_ucm.transaction_number) + len(dtls_ucm.status) + len(dtls_ucm.unconnected_message) ))
 
-            mr_rsp = MessageRouterResponse.unpack(dtls_ucm.unconnected_message)
+            rsp_mr = MessageRouterResponse.unpack(dtls_ucm.unconnected_message)
 
-            if mr_rsp.service != (service_id | 0x80):
+            if rsp_mr.service != (service_id | 0x80):
                 raise Exception("Unexpected service ID in response! expected:{}, got:{}".format(
-                    (service_id | 0x80), mr_rsp.service))
-            if mr_rsp.general_status != 0:
-                raise CIPError(mr_rsp.general_status, mr_rsp.extended_status)
+                    (service_id | 0x80), rsp_mr.service))
+            if rsp_mr.general_status != 0:
+                raise CIPError(rsp_mr.general_status, rsp_mr.extended_status)
 
             if rsp_dt is not None:
-                return rsp_dt.unpack(mr_rsp.response_data._value)
+                return rsp_dt.unpack(rsp_mr.response_data._value)
 
-            return mr_rsp.response_data._value
+            return rsp_mr.response_data._value
         raise Exception("No response from server!")

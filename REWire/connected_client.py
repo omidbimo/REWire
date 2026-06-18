@@ -1,6 +1,7 @@
 import random
 from dataclasses import dataclass
 import logging
+logger = logging.getLogger(__name__)
 
 from .rw_packet import Packet
 from . import eip_encapsulation as eip_encap
@@ -44,11 +45,19 @@ from .exceptions import CIPError
 from .unconnected_client import UnconnectedClient
 from .cip_types import *
 
-logger = logging.getLogger(__name__)
+
 
 __all__ = [
         "ConnectedClient",
         ]
+
+class ExplicitConnectedPacket(Packet):
+    _fields = (
+        ('item_count',   UINT(2)),
+        ('address_item', ConnectedAddressItem()),
+        ('data_item',    ConnectedDataItem()),
+        )
+
 
 class Class3PDU(Packet):
     _fields = (
@@ -136,7 +145,6 @@ class ConnectedClient(ExplicitTransport):
         connection_path += CLASS_ID_SEGMENT(CIPObjectId.MESSAGE_ROUTER)
         connection_path += INSTANCE_ID_SEGMENT(1)
 
-        self.session.add_owner(self)
         ucc = UnconnectedClient(self.session)
         cm = CIPObject(ucc, 6)
 
@@ -199,7 +207,7 @@ class ConnectedClient(ExplicitTransport):
         self.connection_timeout = (((1 << self.timeout_multiplier) * 4) * t2o_api) / 1000000
         self.watchdog = WatchdogTimer(timeout=self.connection_timeout, on_timeout=self.handle_timeout)
         self.isconnected = True
-
+        self.session.add_owner(self)
         logger.info(f"Connection({self.connection_triad}) is opened.")
 
     def close(self):
@@ -242,44 +250,82 @@ class ConnectedClient(ExplicitTransport):
         req.request_data = data
         self.seq_counter = UINT((self.seq_counter + 1) & 0XFFFF)
 
-        pdu = Class3PDU(self.seq_counter, req.pack())
+        req_pdu = Class3PDU(self.seq_counter, req.pack())
 
         if self.session.handle is None:
             raise Exception("No active session to send the connection request!")
+
+        req_explicit = ExplicitConnectedPacket(
+                address_item=ConnectedAddressItem(connection_identifier=self.cip_produced_connection_id),
+                data_item=ConnectedDataItem(data=req_pdu.pack(), length=len(req_pdu.pack())),
+                )
 
         self.session.seq_number += 1
         eip_encap.send_unit_data(self.session.socket,
                                 self.session.handle,
                                 sender_context=self.session.seq_number,
-                                connection_id=self.cip_produced_connection_id,
-                                payload=pdu.pack(),
+                                payload=req_explicit.pack(),
                               )
 
-    def cip_service_rcv_response(self, service_id : int, expected_gsc=None, expected_esc=None, timeout=5000, rsp_dt=None):
+    def cip_service_rcv_response(self, service_id : int, expected_gsc=None, expected_esc=None, timeout=5000):
         rsp, _  = eip_encap.rcv_unit_data(self.session.socket,
                                         self.session.seq_number,
-                                        self.cip_consumed_connection_id,
                                         timeout)
 
-        class3_pdu = Class3PDU.unpack(rsp)
+        rsp_cpf = CPF.unpack(rsp)
+        rsp_addr_item = rsp_cpf.get_item(CPFId.CONNECTED_ADDRESS)
+        if rsp_addr_item is None:
+            raise Exception("No CPF CconnectedAddressItem in the response!")
+
+        if rsp_addr_item.type_id != CPFId.CONNECTED_ADDRESS:
+            raise Exception("Unexpected CPF in SendUnitData response! " +
+                            f"expected:{CPFId.CONNECTED_ADDRESS}, got:{rsp_addr_item.type_id}")
+
+        if rsp_addr_item.length != 4:
+            raise Exception("Unexpected data length in Connected message! " +
+                            f"expected:4 bytes, got:{len(rsp_addr_item.data)} bytes.")
+
+        if rsp_addr_item.connection_identifier != self.cip_consumed_connection_id:
+            raise Exception("Unexpected Connection Id in SendUnitData response! " +
+                            f"expected:{self.cip_consumed_connection_id}, got:{rsp_addr_item.connection_identifier}")
+
+        rsp_data_item = rsp_cpf.get_item(CPFId.CONNECTED_DATA)
+        if rsp_data_item is None:
+            raise Exception("No CPF CconnectedDataItem in the response!")
+
+        if rsp_data_item.type_id != CPFId.CONNECTED_DATA:
+            raise Exception("Unexpected CPF in SendUnitData response! " +
+                            f"expected:{CPFId.CONNECTED_DATA}, got:{rsp_data_item.type_id}")
+
+        if rsp_data_item.length != len(rsp_data_item.data):
+            raise Exception("Unexpected data length in Connected message! " +
+                            f"expected:{rsp_data_item.length}, got:{len(rsp_data_item.data)}")
+
+        class3_pdu = Class3PDU.unpack(rsp_data_item.data)
 
         if class3_pdu.sequence_count != self.seq_counter:
             logger.error("Unexpected sequence counter in response!" +
                          f" expected:{self.seq_counter}, got:{class3_pdu.sequence_count}")
 
-        mr_rsp = MessageRouterResponse.unpack(class3_pdu.payload)
+        rsp_mr = MessageRouterResponse.unpack(class3_pdu.payload)
 
-        if mr_rsp.service != (service_id | 0x80):   #TODO: correct handling?
+        if rsp_mr.service != (service_id | 0x80):   #TODO: correct handling?
             logger.error("Unexpected service ID in response!" +
-                         f"expected:0x{(service_id | 0x80):X}, got:0x{mr_rsp.service:X}")
+                         f"expected:0x{(service_id | 0x80):X}, got:0x{rsp_mr.service:X}")
 
-        if mr_rsp.general_status != GSC.SUCCESS:
-            raise CIPError(mr_rsp.general_status, mr_rsp.extended_status)
+        if rsp_mr.general_status != GSC.SUCCESS:
+            raise CIPError(rsp_mr.general_status, rsp_mr.extended_status)
 
-        if rsp_dt is not None:
-            return rsp_dt.unpack(mr_rsp.response_data)
+        if len(rsp_cpf) > 2:
+            # The response CPF may contain two Socket Address Info items.
+            # Pass these, together with the MR data, to the upper layer
+            # which may be handling a Forward_Open response.
+            return (rsp_mr.response_data,
+                    rsp_cpf.get_item(CPFId.SOCKADDR_INFO_O2T),
+                    rsp_cpf.get_item(CPFId.SOCKADDR_INFO_T2O),
+                    )
 
-        return mr_rsp.response_data
+        return rsp_mr.response_data
 
     def handle_timeout(self):
         self.watchdog.stop()

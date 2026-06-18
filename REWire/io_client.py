@@ -3,6 +3,7 @@ from typing import Any, Optional, Tuple, Union
 import inspect
 import random
 import logging
+logger = logging.getLogger(__name__)
 
 from . import eip_encapsulation as eip_encap
 from .objects import object0x0006 as ConnMng
@@ -36,15 +37,15 @@ from .common import (
     CIPObjectId,
     )
 
+from .objects.cip_object import CIPObjectFactory as CIPObject
 from .exceptions import CIPError
 from .unconnected_client import UnconnectedClient
 
 
-logger = logging.getLogger(__name__)
-
 __all__ = [
         "IOClient",
         ]
+
 
 class Class3PDU(Packet):
     _fields = (
@@ -55,16 +56,16 @@ class Class3PDU(Packet):
 
 class Class0_1_Packet(Packet):
     _fields = (
-                ('item_count',   UINT(2)),
-                ('address_item', SequencedAddressItem()),
-                ('data_item',    ConnectedDataItem()),
-                )
+        ('item_count',   UINT(2)),
+        ('address_item', SequencedAddressItem()),
+        ('data_item',    ConnectedDataItem()),
+        )
 
 
 class IOClient:
     def __init__(self,
             unconnected_client,
-            connection_path, # b"\x04\x20\x04\x24\x01\x2C\x64\x2C\x65"
+            connection_path: PaddedEPATH, # b"\x04\x20\x04\x24\x01\x2C\x64\x2C\x65"
             o2t_rpi = 1000000, # uSec resolution 1000x4 -> 4 sec
             t2o_rpi = 1000000, # uSec resolution 1000x4 -> 4 sec
             timeout_multiplier = 0, # 4x RPI: connection timeout
@@ -80,7 +81,7 @@ class IOClient:
 
         self.ucc = unconnected_client
         if isinstance(connection_path, str) or isinstance(connection_path, bytes):
-            self.connection_path = EPATH(padded=True, path=connection_path)
+            self.connection_path = PaddedEPATH.unpack(connection_path)
         else:
             self.connection_path = connection_path
 
@@ -98,7 +99,7 @@ class IOClient:
         self.seq_counter = UINT(0)
         self.session = None
 
-    def connect(self):
+    def open(self):
         transport_class_and_trigger = TransportClassTrigger(
                 TransportClass.CLASS1,
                 ProductionTrigger.CYCLIC,
@@ -109,9 +110,6 @@ class IOClient:
         tick_time = 0
         while (2**tick_time)*255 < self.ucmm_timeout:
             tick_time += 1
-
-
-        #self.ucc.open()
 
         if isinstance(self.ucc, UnconnectedClient):
             self.session = self.ucc.session
@@ -137,7 +135,7 @@ class IOClient:
                 redundant_owner = False,
                 )
 
-            o2t_api, t2o_api, connection_serial_number, o2t_network_connection_id, t2o_network_connection_id = cm.forward_open(
+            rsp = cm.forward_open(
                         time_tick = tick_time,
                         timeout_ticks = self.ucmm_timeout//(2**tick_time),
                         o2t_network_connection_id = random.randint(0, 0xFFFFFFFF),
@@ -153,6 +151,7 @@ class IOClient:
                         transport_class_and_trigger = transport_class_and_trigger,
                         connection_path = self.connection_path,
                         )
+
         else:
             o2t_conn_params = ConnMng.NetworkConnectionParameters(
                 connection_size = self.o2t_size,
@@ -172,7 +171,7 @@ class IOClient:
                 large_forward_open=True,
                 )
 
-            o2t_api, t2o_api, connection_serial_number, o2t_network_connection_id, t2o_network_connection_id = cm.large_forward_open(
+            rsp = cm.large_forward_open(
                         time_tick = tick_time,
                         timeout_ticks = self.ucmm_timeout//(2**tick_time),
                         o2t_network_connection_id = random.randint(0, 0xFFFFFFFF),
@@ -188,16 +187,17 @@ class IOClient:
                         transport_class_and_trigger = transport_class_and_trigger,
                         connection_path = self.connection_path,
                         )
+        # Unpacking the response
+        o2t_api, t2o_api, connection_serial_number, o2t_network_connection_id, t2o_network_connection_id = rsp
 
         self.connection_serial_number = connection_serial_number
         self.cip_produced_connection_id = o2t_network_connection_id
         self.cip_consumed_connection_id = t2o_network_connection_id
-
-        self.session.connections.append(self)
+        self.session.add_owner(self)
         self.isconnected = True
         logger.debug("Class 3 connection id:0x{:X} is established.".format(o2t_network_connection_id))
 
-    def disconnect(self):
+    def close(self):
         """
         try:
             self.session.peer_ip

@@ -13,9 +13,7 @@ def _import_all():
 
     modules = {}
     for file in files:
-
             file_name = os.path.basename(file).replace(".py", "")
-            print(file_name)
             object_name, rev = file_name.split("_Rev")
             object_revisions = modules.get(object_name, {})
 

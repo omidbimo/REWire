@@ -233,7 +233,10 @@ class EncapSession():
 
     @classmethod
     def from_addr(cls, host_ip: str, server_ip: str, **kwargs):
-        return cls(TCP(host_ip, server_ip), kwargs)
+        timeout = 120.0
+        if kwargs:
+            timeout = kwargs.get("timeout", 120.0)
+        return cls(TCP(host_ip, server_ip), timeout)
 
     def open(self):
         if self.peer_ip is None:

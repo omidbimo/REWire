@@ -64,9 +64,9 @@ class CPFItem(Packet):
         elif type_id == CPFId.CONNECTED_ADDRESS:
             item_type = ConnectedAddressItem
         elif type_id == CPFId.CONNECTED_DATA:
-            item_type = ConnectedDataItem
+            return ConnectedDataItem.dissect(bstream)
         elif type_id == CPFId.UNCONNECTED_DATA:
-            item_type = UnconnectedDataItem
+            return UnconnectedDataItem.dissect(bstream)
         elif type_id == CPFId.LIST_SERVICES:
             item_type = ListServicesItem
         elif type_id == CPFId.SOCKADDR_INFO_O2T:
@@ -102,6 +102,8 @@ class CPF(ARRAY):
         item_count, bstream = UINT.dissect(bstream)
         return super().dissect(bstream, CPFItem, item_count)
 
+    def get_item(self, item_id):
+        return next((item for item in self if item.type_id == item_id), None)
 
 class NullAddressItem(CPFItem):
     _fields = (
@@ -134,6 +136,13 @@ class UnconnectedDataItem(CPFItem):
         ('data', BYTES()),
         )
 
+    @classmethod
+    def dissect(cls, bstream):
+        type_id, bstream = UINT.dissect(bstream)
+        length, bstream = UINT.dissect(bstream)
+        value, bstream = BYTES.dissect(bstream, length)
+        return cls(length=length, data=value), bstream
+
 
 class ConnectedDataItem(CPFItem):
     _fields = (
@@ -142,8 +151,12 @@ class ConnectedDataItem(CPFItem):
         ('data', BYTES()),
         )
 
-    def __init__(self, data=b""):
-        super().__init__(length=len(data), data=data)
+    @classmethod
+    def dissect(cls, bstream):
+        type_id, bstream = UINT.dissect(bstream)
+        length, bstream = UINT.dissect(bstream)
+        value, bstream = BYTES.dissect(bstream, length)
+        return cls(length=length, data=value), bstream
 
 
 class ListServicesItem(CPFItem):
@@ -176,7 +189,7 @@ class SockaddrInfoItem(CPFItem):
         ('sin_family', INT(0)),
         ('sin_port', UINT(0)),
         ('sin_addr', UDINT(0)),
-        ('sin_zero', BYTES(8)),
+        ('sin_zero', SinZero(0)),
         )
 
 

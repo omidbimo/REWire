@@ -90,6 +90,7 @@ class CIPObjectId(REnum):
     PASSWORD_AUTHENTICATOR      = 0X61
     CERTIFICATE_AUTHENTICATOR   = 0X62
     CONNECTION_CONFIGURATION    = 0XF3
+    TCPIP_INTERFACE             = 0xF5
 
 
 class CIPServiceId(REnum):

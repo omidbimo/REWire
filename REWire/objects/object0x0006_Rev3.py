@@ -152,6 +152,7 @@ class ConnectionTriad(Packet):
 
 class Object0x0006(CIPObjectCommon):
     class_id = 0x06
+    revision = 3
     class_name = "Connection Manager Object"
     services = Object0x0006_Services
     _class_attributes = CIPClassAttributes

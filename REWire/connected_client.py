@@ -118,7 +118,7 @@ class ConnectedClient(ExplicitTransport):
         self.isconnected = False
         self.seq_counter = UINT(0)
         self.session = session
-        self.cip_produced_connection_id = 0
+        self.cip_producer_connection_id = 0
         self.watchdog = None
 
     @classmethod
@@ -202,8 +202,8 @@ class ConnectedClient(ExplicitTransport):
                         )
 
         self.connection_serial_number = connection_serial_number
-        self.cip_produced_connection_id = o2t_network_connection_id
-        self.cip_consumed_connection_id = t2o_network_connection_id
+        self.cip_producer_connection_id = o2t_network_connection_id
+        self.cip_consumer_connection_id = t2o_network_connection_id
         self.connection_timeout = (((1 << self.timeout_multiplier) * 4) * t2o_api) / 1000000
         self.watchdog = WatchdogTimer(timeout=self.connection_timeout, on_timeout=self.handle_timeout)
         self.isconnected = True
@@ -256,7 +256,7 @@ class ConnectedClient(ExplicitTransport):
             raise Exception("No active session to send the connection request!")
 
         req_explicit = ExplicitConnectedPacket(
-                address_item=ConnectedAddressItem(connection_identifier=self.cip_produced_connection_id),
+                address_item=ConnectedAddressItem(connection_identifier=self.cip_producer_connection_id),
                 data_item=ConnectedDataItem(data=req_pdu.pack(), length=len(req_pdu.pack())),
                 )
 
@@ -285,9 +285,9 @@ class ConnectedClient(ExplicitTransport):
             raise Exception("Unexpected data length in Connected message! " +
                             f"expected:4 bytes, got:{len(rsp_addr_item.data)} bytes.")
 
-        if rsp_addr_item.connection_identifier != self.cip_consumed_connection_id:
+        if rsp_addr_item.connection_identifier != self.cip_consumer_connection_id:
             raise Exception("Unexpected Connection Id in SendUnitData response! " +
-                            f"expected:{self.cip_consumed_connection_id}, got:{rsp_addr_item.connection_identifier}")
+                            f"expected:{self.cip_consumer_connection_id}, got:{rsp_addr_item.connection_identifier}")
 
         rsp_data_item = rsp_cpf.get_item(CPFId.CONNECTED_DATA)
         if rsp_data_item is None:
@@ -347,8 +347,8 @@ class ConnectedClient(ExplicitTransport):
     def cleanup(self):
         self.watchdog = None
         self.session = None
-        self.cip_produced_connection_id = None
-        self.cip_consumed_connection_id = None
+        self.cip_producer_connection_id = None
+        self.cip_consumer_connection_id = None
         self.isconnected = False
 
     def __del__(self):

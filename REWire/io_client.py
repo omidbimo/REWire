@@ -191,8 +191,8 @@ class IOClient:
         o2t_api, t2o_api, connection_serial_number, o2t_network_connection_id, t2o_network_connection_id = rsp
 
         self.connection_serial_number = connection_serial_number
-        self.cip_produced_connection_id = o2t_network_connection_id
-        self.cip_consumed_connection_id = t2o_network_connection_id
+        self.cip_producer_connection_id = o2t_network_connection_id
+        self.cip_consumer_connection_id = t2o_network_connection_id
         self.session.add_owner(self)
         self.isconnected = True
         logger.debug("Class 3 connection id:0x{:X} is established.".format(o2t_network_connection_id))
@@ -203,9 +203,9 @@ class IOClient:
             self.session.peer_ip
         except:
             raise Exception("No active session to close the connection 0x{:X}!".format(
-                    self.cip_produced_connection_id))
+                    self.cip_producer_connection_id))
             #logger.error("No active session to close the connection 0x{:X}!".format(
-            #        self.connection.cip_produced_connection_id))
+            #        self.connection.cip_producer_connection_id))
         """
         # 2^tick_time * timeout_ticks = timeout mS
         tick_time = 0
@@ -220,10 +220,10 @@ class IOClient:
                          self.originator_serial_number)
 
         logger.debug("Class 3 connection id:0x{:08X} is closed.".format(
-                self.cip_produced_connection_id))
+                self.cip_producer_connection_id))
 
-        self.cip_produced_connection_id = None
-        self.cip_consumed_connection_id = None
+        self.cip_producer_connection_id = None
+        self.cip_consumer_connection_id = None
         self.isconnected = False
         self.session = None
         self.ucc = None

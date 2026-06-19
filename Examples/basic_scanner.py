@@ -6,10 +6,15 @@ logging.basicConfig(level=logging.WARNING,
     format="%(asctime)s - %(levelname)-8s <%(name)s> %(message)s")
 logger = logging.getLogger(__name__)
 
-import REWire.eip_encapsulation as eip_encap
+from REWire import (
+    UDP,
+    TCP,
+    EncapSession,
+    list_identity,
+    UnconnectedClient,
+)
+
 from REWire.common_packet_format import CPFId
-from REWire.unconnected_client import UnconnectedClient
-from REWire.rw_socket import UDP, TCP
 from REWire.cip_types import *
 
 class BasicScanner():
@@ -25,7 +30,7 @@ class BasicScanner():
         param: echo: If True, the list of discovered devices is printed to the console.
 
         return: A list of responses to the broadcasted List Identity request.
-                Each response may contain more than one Identity item.
+                Each response may contain more than one CPF Identity item.
         """
         # TODO: use directed broadcast addresses instead of limited Broadcast address
         broadcast_ip = "255.255.255.255" # Limited broadcast address
@@ -33,8 +38,7 @@ class BasicScanner():
         #    ~struct.unpack("!I", inet_aton(subnet_mask))[0] & 0xFFFFFFFF |
         #    struct.unpack("!I", inet_aton(self.host_ip))[0])))
 
-        sock = UDP(self.host_ip, broadcast_ip, timeout=(float(max_delay_ms)/1000))
-        list_identity_rsp = eip_encap.list_identity(sock, max_delay_ms=max_delay_ms)
+        list_identity_rsp = list_identity(socket_=UDP(self.host_ip, broadcast_ip), max_delay_ms=max_delay_ms)
 
         discovered = []
         for device in list_identity_rsp:
@@ -53,7 +57,7 @@ class BasicScanner():
 
     def cip_service(self, server_ip, service_id, class_id, instance_id, attribute_id=None,
                     data=BYTES(), rsp_dt=None):
-        ucc = UnconnectedClient(eip_encap.EncapSession(TCP(self.host_ip, server_ip)))
+        ucc = UnconnectedClient(EncapSession(TCP(self.host_ip, server_ip)))
         rsp = ucc.cip_service(service_id, class_id, instance_id, attribute_id,
                                         data=data, timeout=6000, rsp_dt=rsp_dt)
         ucc.session.close()
@@ -73,7 +77,6 @@ class BasicScanner():
                                 data, rsp_dt=rsp_dt)
 
 if __name__ == "__main__":
-
     host_ip = "192.168.210.100"
     # Create a new instance of BasicScanner which is an Unconnected Client
     ucc = BasicScanner(host_ip)

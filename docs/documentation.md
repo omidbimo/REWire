@@ -1,3 +1,23 @@
+# 
+
+# Table of Contents
+
+- [Overvirw](#Overview)
+
+- [Modules](#Modules)
+  
+  - [eip_encapsulation](#eip_encapsulation)
+  
+  - [common_packet_format](#common_packet_format)
+  
+  - [unconnected_client](#unconnected_client)
+    
+    
+    
+    
+    
+    
+
 # Overview
 
 REWire is built around two core modules that handle protocol serialization and deserialization.
@@ -47,3 +67,115 @@ REWire is designed around the structure of the EtherNet/IP™ protocol itself. T
 The following diagram demonstrates the API layering of REWire.
 
 ![REWire Architecture](images/LayeringModel.drawio.svg "REWire Architecture")
+
+
+
+# Modules
+
+## eip_encapsulation
+
+All encapsulation services are defined as Packets and methods in this module:
+
+### Packets
+
+- NOP
+
+- ListServicesRequest
+
+- ListServicesResponse
+
+- ListIdentityRequest
+
+- ListIdentityResponse
+
+- ListInterfacesRequest
+
+- ListInterfacesResponse
+
+- RegisterSessionRequest
+
+- RegisterSessionResponse
+
+- UnregisterSessionRequest
+
+- SendRRData
+
+- SendUnitData
+
+### Classes
+
+- EncapSession
+
+### Methods
+
+- nop(socket_: RWSocket) 
+
+- list_services(socket_: RWSocket)
+
+- list_identity(socket_: RWSocket, max_delay_ms=500)
+
+- list_interfaces(socket_: RWSocket)
+
+- register_session(socket_: RWSocket)
+
+- unregister_session(socket_, session_handle)
+
+- send_rr_data(socket_: RWSocket, session_handle, sender_context, payload, timeout=0)
+
+- rcv_rr_data(socket_: RWSocket, sender_context, timeout=5000)
+
+- send_unit_data(socket_: RWSocket, session_handle, sender_context, payload, timeout=0)
+
+- rcv_unit_data(socket_, sender_context, timeout=5000)
+  
+  
+
+## common_packet_format
+
+This module contains all Packets covering EtherNet/IP's Common Packet Format
+
+### Packets
+
+- CPF
+
+- CPFItem
+
+- NullAddressItem
+
+- ConnectedAddressItem
+
+- SequencedAddressItem
+
+- UnconnectedDataItem
+
+- ConnectedDataItem
+
+- ListServicesItem
+
+- SockaddrInfoItem
+
+- CIPIdentityItem
+
+- CIPSecurityItem
+
+- EtherNetIPCapabilityItem
+
+- EtherNetIPUsageItem
+
+- DTLSUnconnectedMessageItem
+
+## unconnected_client
+
+This module contains UCMM-related packets, objects and services.
+
+### Packets
+
+- UCMMPacket
+
+- DTLSUnconnectedPacket
+
+### Classes
+
+- **UnconnectedClient** a wrapper around `EncapSession` that abstracts unconnected messaging over an encapsulation session.
+
+- **DTLSClient** a wrapper around EncapSession that abstracts unconnected messaging over an encapsulation session that uses DTLS

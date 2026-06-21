@@ -1,7 +1,7 @@
 import logging
 logging.basicConfig(level=logging.INFO,
     format="%(asctime)s - %(levelname)-8s <%(name)s> %(message)s")
-logger = logging.getLogger(__name__)
+
 
 from REWire import (
     TCP,
@@ -13,6 +13,8 @@ from REWire import (
 )
 
 from REWire.cip_types import *
+
+logger = logging.getLogger(__name__)
 
 def unconnected_messaging_demo(host_ip, server_ip):
     """
@@ -36,7 +38,6 @@ def unconnected_messaging_demo(host_ip, server_ip):
 
     # The standard return value of unconnected services is cip_types.BYTES which is equal to python bytes
     print("  Vendor Id:", ucc.get_attribute_single(class_id=CIPObjectId.IDENTITY, instance_id=1, attribute_id=1))
-
     print("  Product Name:", ucc.get_attribute_single(CIPObjectId.IDENTITY, 1, 7))
 
     # Optionally, a cip_type can be provided when invoking the service. The
@@ -49,21 +50,21 @@ def unconnected_messaging_demo(host_ip, server_ip):
     # Electronic Key 4
     try:
         # Adapt the ekey values to your server identity
-        print(ucc.get_attribute_single(1, 1, 2, ekey=ELECTRONIC_KEY_4(0, 12, 100, 1, 1), rsp_dt=UINT))
+        print(ucc.get_attribute_single(CIPObjectId.IDENTITY, 1, 2, ekey=ELECTRONIC_KEY_4(0, 12, 100, 1, 1), rsp_dt=UINT))
     except CIPError as ex:
         print(ex)
 
     # Electronic Key 5
     try:
         # Adapt the ekey values to your server identity
-        print(ucc.get_attribute_single(1, 1, 2, ekey=ELECTRONIC_KEY_5(0, 12, 1, 1, 1, 123456789), rsp_dt=UINT))
+        print(ucc.get_attribute_single(CIPObjectId.IDENTITY, 1, 2, ekey=ELECTRONIC_KEY_5(0, 12, 1, 1, 1, 123456789), rsp_dt=UINT))
     except CIPError as ex:
         print(ex)
 
     # Electronic Key
     try:
         # Adapt the ekey values to your server identity
-        print(ucc.get_attribute_single(1, 1, 2, ekey=ELECTRONIC_KEY_SEGMENT(4, 0, 12, 1, 1, 1, 123456789), rsp_dt=UINT))
+        print(ucc.get_attribute_single(CIPObjectId.IDENTITY, 1, 2, ekey=ELECTRONIC_KEY_SEGMENT(4, 0, 12, 1, 1, 1, 123456789), rsp_dt=UINT))
     except CIPError as ex:
         print(ex)
 

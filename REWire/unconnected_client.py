@@ -46,7 +46,8 @@ class UCMMPacket(Packet):
         ('data_item',    UnconnectedDataItem()),
         )
 
-class DTLS_UnconnectedEncapPacket(Packet):
+
+class DTLSUnconnectedPacket(Packet):
     _fields = (
         ('item_count', UINT(1)),
         ('type_id', UINT(CPFId.DTLS_UNCONNECTED_MESSAGE)),
@@ -145,9 +146,9 @@ class UnconnectedClient(ExplicitTransport):
         return rsp_mr.response_data
 
 
-class DTLS_Client(ExplicitTransport):
+class DTLSClient(ExplicitTransport):
     def __init__(self, session):
-        super(DTLS_Client, self).__init__()
+        super().__init__()
         self.socket = None
         self.connections = []
         self.seq_number = 0
@@ -177,7 +178,7 @@ class DTLS_Client(ExplicitTransport):
             logger.warning(inspect.currentframe().f_code.co_name +
                 "Request ({} bytes) longer than maximum Message-Router size (504 bytes).".format(len(mr_req.pack())))
 
-        dtls_ucm = DTLS_UnconnectedEncapPacket(mr_req.pack())
+        dtls_ucm = DTLSUnconnectedPacket(mr_req.pack())
         self.socket.send(dtls_ucm.pack())
 
     def cip_service_rcv_response(self, service_id, timeout=2000, rsp_dt=None):

@@ -76,7 +76,7 @@ class CPFItem(Packet):
         elif type_id == CPFId.SEQUENCED_ADDRESS:
             item_type = SequencedAddressItem
         elif type_id == CPFId.DTLS_UNCONNECTED_MESSAGE:
-            item_type = DTLS_UnconnectedMessageItem
+            item_type = DTLSUnconnectedMessageItem
         else:
             raise Exception(f"Unknown CPF item: 0x{type_id:X}")
         # Don't call the item_type.dissect(). this will recall the super.dissect which is this
@@ -104,6 +104,7 @@ class CPF(ARRAY):
 
     def get_item(self, item_id):
         return next((item for item in self if item.type_id == item_id), None)
+
 
 class NullAddressItem(CPFItem):
     _fields = (
@@ -310,6 +311,7 @@ class CIPSecurityItem(CPFItem):
             msg += "    - CIP User Authentication Profile"
         return msg
 
+
 class EtherNetIPCapabilityItem(CPFItem):
     _fields = (
         ('type_id',                         UINT(CPFId.ETHERNETIP_CAPABILITY)),
@@ -356,7 +358,7 @@ class EtherNetIPUsageItem(CPFItem):
         return msg
 
 
-class DTLS_UnconnectedMessageItem(CPFItem):
+class DTLSUnconnectedMessageItem(CPFItem):
     _fields = (
         ('type_id', UINT(CPFId.DTLS_UNCONNECTED_MESSAGE)),
         ('length', UINT(10)),
@@ -365,7 +367,3 @@ class DTLS_UnconnectedMessageItem(CPFItem):
         ('status', UDINT(0)),
         ('unconnected_message', BYTES()),
         )
-
-    def __init__(self, unconnected_message=b""):
-        super().__init__(length=10+len(unconnected_message), unconnected_message=unconnected_message)
-

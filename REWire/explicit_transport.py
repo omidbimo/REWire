@@ -50,6 +50,7 @@ class ExplicitTransport:
 
         if rsp_dt is not None:
             return rsp_dt.unpack(rsp)
+
         return rsp
 
     def get_attributes_all(self, class_id, instance_id,

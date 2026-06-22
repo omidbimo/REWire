@@ -11,9 +11,9 @@ from REWire import (
 
 def list_identity_demo(host_ip):
     """
-    Example demonstrating the `list_identity` service of the encapsulation layer.
+    Example demonstrating the list_identity service of the encapsulation layer.
 
-    This example covers three `list_identity` scenarios:
+    This example covers three list_identity scenarios:
         - Broadcast List Identity over UDP.
         - Unicast List Identity over UDP.
         - Unicast List Identity over TCP.

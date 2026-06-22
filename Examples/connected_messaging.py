@@ -2,15 +2,16 @@ import logging
 logging.basicConfig(level=logging.INFO,
     format="%(asctime)s - %(levelname)-8s <%(name)s> %(message)s")
 
-
 from REWire import (
     TCP,
     CIPError,
     EncapSession,
-    ConnectedClient
+    ConnectedClient,
     CIPServiceId,
     CIPObjectId,
 )
+
+from REWire.cip_types import *
 
 
 def connected_messaging_demo(host_ip, server_ip):

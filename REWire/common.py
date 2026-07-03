@@ -131,6 +131,7 @@ class CIP_Object_Attribute():
                 'name:         {}'.format(self.name)
                 )
 
+
 class CIP_Object_Service():
     def __init__(self, service_id, instance_id, fn, name=''):
         self.instance_id = instance_id
@@ -144,6 +145,7 @@ class CIP_Object_Service():
                 'attribute_id: {}\n'.format(self.id) +
                 'name:         {}'.format(self.name)
                 )
+
 
 class CIP_Object_AttributeList():
     def __init__(self, attributes=[]):

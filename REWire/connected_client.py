@@ -245,7 +245,6 @@ class ConnectedClient(ExplicitTransport):
         self.cleanup()
 
     def cip_service_send_request(self, service_id : int, class_id, instance_id, attribute_id, data, *args, **keyargs):
-        self.watchdog.reset()
         req = MessageRouterRequest(service=service_id)
         req.request_path = RequestPath(class_id, instance_id, attribute_id)
         req.request_data = data
@@ -267,6 +266,7 @@ class ConnectedClient(ExplicitTransport):
                                 sender_context=self.session.seq_number,
                                 payload=req_explicit.pack(),
                               )
+        self.watchdog.reset()
 
     def cip_service_rcv_response(self, service_id : int, expected_gsc=None, expected_esc=None, timeout=5000):
 
@@ -317,7 +317,9 @@ class ConnectedClient(ExplicitTransport):
 
         if rsp_mr.general_status != GSC.SUCCESS:
             raise CIPError(rsp_mr.general_status, rsp_mr.extended_status)
+
         self.watchdog.reset()
+
         if len(rsp_cpf) > 2:
             # The response CPF may contain two Socket Address Info items.
             # Pass these, together with the MR data, to the upper layer

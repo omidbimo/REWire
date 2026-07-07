@@ -140,9 +140,34 @@ class IOClient:
         self._consumer_data[:] = self._consumer_data_pending
         return self._consumer_data
 
-    def update_output(self, data:bytes, data_sequence_counter=0, run_idle_value=None):
-        data_counter = UINT(data_sequence_counter & 0xFFFF)
+    def update_output(self, data:bytes, data_sequence_counter:int=None, run_idle_value:int=None):
+        """
+        Update the cyclic O->T process data.
+        Args:
+            data: I/O data payload in bytes.
+            data_sequence_counter: Optional 2-byte data sequence counter. Omit if not used in the packet
+            run_idle_value: Optional 32-bit Run/Idle header value. Omit if not used in the packet.
+
+        Payload format transmitted:
+            [Data Sequence Counter (0 or 2 bytes)]
+            [Run/Idle Header       (0 or 4 bytes)]
+            [User Data]
+
+        The user is responsible for providing the data whose size, together with any protocol headers,
+        matches the O->T connection size negotiated during the Forward Open.
+
+        Example: negotiated O->T connection size = 100 bytes, 32-bit header format
+            Class 1 payload: Sequence Counter (2) + Run/Idle (4) + User Data (94) = 100
+            Class 0 payload: Run/Idle (4) + User Data (96) = 100
+
+        No size validation or padding is performed before send.
+        Incorrect data length produces an invalid cyclic I/O packet.
+        """
+        data_counter = BYTES()
         run_idle_header = BYTES()
+
+        if data_sequence_counter is not None:
+            data_counter = UINT(data_sequence_counter & 0xFFFF)
         if run_idle_value is not None:
             run_idle_header = UDINT(run_idle_value & 0xFFFFFFFF)
 

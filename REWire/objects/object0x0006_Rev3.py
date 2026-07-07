@@ -3,9 +3,11 @@ logger = logging.getLogger(__name__)
 
 from ..rw_packet import Packet
 from ..cip_types import *
-from .cip_object import *
 from ..common    import *
 from ..rw_enum import REnum
+from ..common_packet_format import SockaddrInfoItem
+
+from .cip_object import *
 from .object0x0005_Rev2 import TransportClassTrigger
 
 
@@ -222,9 +224,14 @@ class Object0x0006(CIPObjectCommon):
                                       instance_id=1, data=fwd_open_req, timeout=5000)
         # The response may contain only a MR response or additionally two
         # Socket Address Info items if the ForwardOpen is meant to open a Class 0/1 connection.
+        t2o_port = None
+        t2o_addr = None
         if isinstance(rsp, tuple):
+            assert len(rsp) == 3
             fwd_open_rsp = ForwardOpenResponse.unpack(rsp[0])
-            # TODO: handle the socket address info items
+            import struct
+            t2o_port = struct.unpack('>H', struct.pack('=H', rsp[2].sin_port))[0]
+            t2o_addr = struct.unpack('>I', struct.pack('=I', rsp[2].sin_addr))[0]
         else:
             fwd_open_rsp = ForwardOpenResponse.unpack(rsp)
 
@@ -249,6 +256,15 @@ class Object0x0006(CIPObjectCommon):
             raise Exception("Invalid Originator Vendor ID in ForwardOpen response!" +
                 " expected:0x{:08X}, got:0x{:08X}".format(
                     originator_serial_number, fwd_open_rsp.originator_serial_number))
+
+        if t2o_addr is not None:
+            return (fwd_open_rsp.o2t_api,
+                    fwd_open_rsp.t2o_api,
+                    connection_serial_number,
+                    fwd_open_rsp.o2t_network_connection_id,
+                    fwd_open_rsp.t2o_network_connection_id,
+                    t2o_port,
+                    t2o_addr)
 
         return (fwd_open_rsp.o2t_api,
                 fwd_open_rsp.t2o_api,

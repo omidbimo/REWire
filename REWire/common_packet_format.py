@@ -124,7 +124,7 @@ class ConnectedAddressItem(CPFItem):
 class SequencedAddressItem(CPFItem):
     _fields = (
         ('type_id', UINT(CPFId.SEQUENCED_ADDRESS)),
-        ('length', UINT(0)),
+        ('length', UINT(8)),
         ('connection_identifier', UDINT(0)),
         ('encapsulation_sequence_number', UDINT(0)),
         )
@@ -192,7 +192,6 @@ class SockaddrInfoItem(CPFItem):
         ('sin_addr', UDINT(0)),
         ('sin_zero', SinZero(0)),
         )
-
 
 class CIPIdentityItem(CPFItem):
     _fields = (

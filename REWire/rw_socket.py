@@ -61,6 +61,14 @@ class RWSocket:
         return ("", b"")
 
     @property
+    def host_ip(self):
+        return self._socket.getsockname()[0]
+
+    @property
+    def host_port(self):
+        return self._socket.getsockname()[1]
+
+    @property
     def peer_ip(self):
         return self._socket.getpeername()[0]
 

@@ -272,6 +272,13 @@ class EncapSession():
             return None
 
     @property
+    def host_ip(self):
+        try:
+            return self.socket.host_ip
+        except:
+            return None
+
+    @property
     def peer_ip(self):
         try:
             return self.socket.peer_ip

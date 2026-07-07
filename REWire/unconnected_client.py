@@ -82,6 +82,12 @@ class UnconnectedClient(ExplicitTransport):
     def peer_ip(self):
         return self.session.socket.peer_ip
 
+    def open(self):
+        self.session.open()
+
+    def close(self):
+        self.session.close()
+
     def cip_service_send_request(self, service_id, class_id, instance_id,
             attribute_id, data=b'', ekey: ELECTRONIC_KEY_SEGMENT=None):
 

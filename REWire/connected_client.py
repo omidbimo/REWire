@@ -82,6 +82,8 @@ class ConnectionTriad:
                 f", connection_serial_number:0x{self.connection_serial_number:04X}"
                 f"originator_serial_number:{self.originator_serial_number})")
 
+    def __hash__(self):
+        return hash((self.originator_vendor_id, self.originator_serial_number, self.connection_serial_number))
 
 class ConnectedClient(ExplicitTransport):
 
@@ -208,7 +210,7 @@ class ConnectedClient(ExplicitTransport):
         self.watchdog = WatchdogTimer(timeout=self.connection_timeout, on_timeout=self.handle_timeout)
         self.isconnected = True
         self.session.add_owner(self)
-        logger.info(f"Connection({self.connection_triad}) is opened.")
+        logger.info(f"Class 3 connection{self.connection_triad} is opened.")
 
     def close(self):
         if self.watchdog:
@@ -237,7 +239,7 @@ class ConnectedClient(ExplicitTransport):
                          self.originator_vendor_id,
                          self.originator_serial_number)
 
-        logger.info(f"Connection{self.connection_triad} is closed.")
+        logger.info(f"Class 3 connection{self.connection_triad} is closed.")
 
         if self.session:
             self.session.remove_owner(self)

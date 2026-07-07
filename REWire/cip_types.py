@@ -40,6 +40,7 @@ __all__ = [
     "PaddedEPATH",
     "RequestPath",
 ]
+
 class Dissect:
     def sint(bstream):
         return ( bstream[0], bstream[1:] )

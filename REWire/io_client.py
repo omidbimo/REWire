@@ -64,9 +64,10 @@ class IOClient:
     _io_scheduler = None
 
     def __init__(self,
-            unconnected_client,
+            host_ip,
+            target_ip,
             connection_path: PaddedEPATH, # b"\x04\x20\x04\x24\x01\x2C\x64\x2C\x65"
-            transport_class=1,
+            transport_class=TransportClass.CLASS1,
             o2t_rpi = 1000000, # uSec resolution 1000x4 -> 4 sec
             t2o_rpi = 1000000, # uSec resolution 1000x4 -> 4 sec
             timeout_multiplier = 0, # 4x RPI: connection timeout
@@ -80,15 +81,16 @@ class IOClient:
             ucmm_timeout = 5000, # milliseconds
             ):
 
-        self.ucc = unconnected_client
         if isinstance(connection_path, str) or isinstance(connection_path, bytes):
             self.connection_path = PaddedEPATH.unpack(connection_path)
         else:
             self.connection_path = connection_path
 
-        if transport_class > 1:
+        if transport_class > TransportClass.CLASS1:
             raise Exception(f"Unsupported transport class: {transport_class} for an implicit connection.")
 
+        self.host_ip = host_ip
+        self.target_ip = target_ip
         self.o2t_rpi = o2t_rpi
         self.t2o_rpi = t2o_rpi
         self.timeout_multiplier = timeout_multiplier
@@ -101,9 +103,7 @@ class IOClient:
         self.ucmm_timeout = ucmm_timeout
         self.isconnected = False
         self.transport_class = transport_class
-        self.session = None
 
-        self._peer_ip = None
         self._o2t_socket = None
         self._t2o_socket = None
         self._next_send = None
@@ -181,7 +181,7 @@ class IOClient:
                                                       encapsulation_sequence_number=self._producing_encap_seq_counter)
         o2t_packet.data_item = ConnectedDataItem(length=len(self._producer_data), data=self._producer_data)
 
-        self._o2t_socket.sendto(o2t_packet.pack(), (self._peer_ip, 2222))
+        self._o2t_socket.sendto(o2t_packet.pack(), (self.target_ip, 2222))
 
     def _receive(self):
         data, addr = self.socket.recvfrom(1500)
@@ -227,12 +227,9 @@ class IOClient:
         while (2**tick_time)*255 < self.ucmm_timeout:
             tick_time += 1
 
-        if isinstance(self.ucc, UnconnectedClient):
-            self.session = self.ucc.session
-        else:
-            self.session = self.ucc
-
-        cm = CIPObject(self.ucc, 6)
+        ucc = UnconnectedClient.from_addr(self.host_ip, self.target_ip)
+        ucc.open()
+        cm = CIPObject(ucc, 6)
 
         if self.o2t_size <= 511 and self.t2o_size <= 511:
             o2t_conn_params = ConnMng.NetworkConnectionParameters(
@@ -311,28 +308,22 @@ class IOClient:
         self.connection_serial_number = connection_serial_number
         self.cip_producer_connection_id = o2t_network_connection_id
         self.cip_consumer_connection_id = t2o_network_connection_id
-        self.session.add_owner(self)
+
         self._o2t_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self._o2t_socket.bind((socket.inet_ntoa(t2o_addr.to_bytes(4, "big")), 2222))
-        self._peer_ip = self.session.peer_ip
         logger.info(f"Class 1 connection{self.connection_triad} is opened.")
+        ucc.close()
 
     def close(self):
-        """
-        try:
-            self.session.peer_ip
-        except:
-            raise Exception("No active session to close the connection 0x{:X}!".format(
-                    self.cip_producer_connection_id))
-            #logger.error("No active session to close the connection 0x{:X}!".format(
-            #        self.connection.cip_producer_connection_id))
-        """
+
         # 2^tick_time * timeout_ticks = timeout mS
         tick_time = 0
         while (2**tick_time)*255 < self.ucmm_timeout:
             tick_time += 1
 
-        cm = CIPObject(self.ucc, 6)
+        ucc = UnconnectedClient.from_addr(self.host_ip, self.target_ip)
+        ucc.open()
+        cm = CIPObject(ucc, 6)
         cm.forward_close(tick_time,
                          self.ucmm_timeout//(2**tick_time),
                          self.connection_serial_number,
@@ -344,8 +335,7 @@ class IOClient:
         self.cip_producer_connection_id = None
         self.cip_consumer_connection_id = None
         self.isconnected = False
-        self.session = None
-        self.ucc = None
+        ucc.close()
 
 
 

@@ -279,13 +279,6 @@ class Object0x0006(CIPObjectCommon):
                       connection_serial_number,
                       originator_vendor_id,
                       originator_serial_number):
-        try:
-            self.client.peer_ip
-        except:
-            raise Exception("No active session to close the connection 0x{:X}!".format(
-                    self.client.connection.cip_producer_connection_id))
-            #logger.error("No active session to close the connection 0x{:X}!".format(
-            #        self.connection.cip_producer_connection_id))
 
         fw_close_req = ForwardCloseRequest(
                 priority_time_tick = time_tick,

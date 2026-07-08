@@ -74,6 +74,10 @@ class UnconnectedClient(ExplicitTransport):
         #if self.session:
         #    self.session.close()
 
+    @classmethod
+    def from_addr(cls, host_ip, server_ip):
+        return cls(eip_encap.EncapSession.from_addr(host_ip, server_ip))
+
     @property
     def ip(self):
         return self.session.host_ip
@@ -93,7 +97,8 @@ class UnconnectedClient(ExplicitTransport):
 
         if self.session:
             self.session.open()
-
+        else:
+            raise Exception("Unconnected Client instance is not valid anymore!")
         mr_req = MessageRouterRequest(service=service_id)
         if ekey is not None:
             mr_req.request_path += ekey

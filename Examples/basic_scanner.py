@@ -79,10 +79,10 @@ class BasicScanner():
 if __name__ == "__main__":
     host_ip = "192.168.210.100"
     # Create a new instance of BasicScanner which is an Unconnected Client
-    ucc = BasicScanner(host_ip)
+    scanner = BasicScanner(host_ip)
     discovered_ips = []
     # This client has a discovery method. It returns a list of CFP_items for each discovered device
-    for cpf_items in ucc.discover(max_delay_ms=1000, echo=True):
+    for cpf_items in scanner.discover(max_delay_ms=1000, echo=True):
         # Extract EtherNet/IP node's IP address
         for item in cpf_items:
             if item.type_id == CPFId.CIP_IDENTITY: #List Identity Item
@@ -94,14 +94,14 @@ if __name__ == "__main__":
         # It's not possible to use a same session for a sequence of services.
         print(f"*** Server {ip_address} ***")
         print("get_attribute_single returns CIP data in bytes format:")
-        print(f"Identity instance attribute 7 (Product Name): {ucc.get_attribute_single(ip_address, 1, 1, 7)}")
+        print(f"Identity instance attribute 7 (Product Name): {scanner.get_attribute_single(ip_address, 1, 1, 7)}")
         print()
         print("get_attributes_all returns CIP data in bytes format:")
-        print(f"Identity instance get_attributes_all: {ucc.get_attributes_all(ip_address, 1, 1)}")
+        print(f"Identity instance get_attributes_all: {scanner.get_attributes_all(ip_address, 1, 1)}")
         print()
         print("get_attribute_single returns unpacked data when data type is provided:")
-        print(f"Identity instance attribute 1 (Vendor Id): {ucc.get_attribute_single(ip_address, 1, 1, 1, rsp_dt=UINT)}")
-        print(f"Identity instance attribute 7 (Product Name): {ucc.get_attribute_single(ip_address, 1, 1, 7, rsp_dt=SHORT_STRING)}")
+        print(f"Identity instance attribute 1 (Vendor Id): {scanner.get_attribute_single(ip_address, 1, 1, 1, rsp_dt=UINT)}")
+        print(f"Identity instance attribute 7 (Product Name): {scanner.get_attribute_single(ip_address, 1, 1, 7, rsp_dt=SHORT_STRING)}")
         # Alternative way to call GetAttributeSingle with response data-type provided
-        print(f"Identity instance attribute 6 (Serial Number): {ucc.cip_service(ip_address, 0x0E, 1, 1, 6, rsp_dt=UDINT)}")
+        print(f"Identity instance attribute 6 (Serial Number): {scanner.cip_service(ip_address, 0x0E, 1, 1, 6, rsp_dt=UDINT)}")
         print()

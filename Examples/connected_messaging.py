@@ -111,5 +111,5 @@ def connected_messaging_demo(host_ip, server_ip):
 
 if __name__ == "__main__":
     host_ip = "192.168.210.100"
-    server_ip = "192.168.210.132"
+    server_ip = "192.168.210.10"
     connected_messaging_demo(host_ip, server_ip)

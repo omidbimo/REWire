@@ -68,7 +68,7 @@ def unconnected_messaging_demo(host_ip, server_ip):
     except CIPError as ex:
         print(ex)
 
-    ucc.session.close()
+    ucc.close()
 
     # Secure communication is possible when the server supports CIP security
     try:
@@ -84,6 +84,8 @@ def unconnected_messaging_demo(host_ip, server_ip):
 
     except CIPError as ex:
         print(ex)
+    except Exception:
+        pass
 
     # Using other services provided by the UnconnectedClient
     ucc = UnconnectedClient(EncapSession.from_addr(host_ip, server_ip))
@@ -111,10 +113,10 @@ def unconnected_messaging_demo(host_ip, server_ip):
                     )
     except CIPError as ex:
         print(ex)
-    # Closing the encapsulation session and consequently the TCP stream
-    ucc.session.close()
+    # Closing the encapsulation session and TCP stream
+    ucc.close()
 
 if __name__ == "__main__":
     host_ip = "192.168.210.100"
-    server_ip = "192.168.210.132"
+    server_ip = "192.168.210.10"
     unconnected_messaging_demo(host_ip, server_ip)

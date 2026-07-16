@@ -83,7 +83,7 @@ class IOClient:
     _io_scheduler = None
 
     def __init__(self,
-            ucc : UnconnectedClient,
+            session: eip_encap.EncapSession,
             connection_path: PaddedEPATH, # b"\x04\x20\x04\x24\x01\x2C\x64\x2C\x65"
             transport_class=TransportClass.CLASS1,
             o2t_rpi = 1000000, # uSec resolution 1000x4 -> 4 sec
@@ -107,8 +107,8 @@ class IOClient:
         if transport_class > TransportClass.CLASS1:
             raise Exception(f"Unsupported transport class: {transport_class} for an implicit connection.")
 
-        self.ucc = ucc
-        self.target_ip = self.ucc.peer_ip
+        self.session = session
+        self.target_ip = None
         self.o2t_rpi = o2t_rpi
         self.t2o_rpi = t2o_rpi
         self.timeout_multiplier = timeout_multiplier
@@ -136,7 +136,6 @@ class IOClient:
         self._consuming_run_idle = UDINT(0)
         self._consumer_data_pending = bytearray()
         self._consumer_data = bytearray()
-
 
         if self._io_scheduler is None:
             self._io_scheduler = IOScheduler()
@@ -234,6 +233,11 @@ class IOClient:
             f"<O->T: 0x{self.cip_producer_connection_id:08X}, T->O: 0x{self.cip_consumer_connection_id:08X}>")
 
     def open(self):
+        if not self.session.handle:
+            self.session.open()
+
+        self.target_ip = self.session.peer_ip
+
         transport_class_and_trigger = TransportClassTrigger(
                 TransportClass.CLASS0 if self.transport_class==0 else TransportClass.CLASS1 ,
                 ProductionTrigger.CYCLIC,
@@ -245,7 +249,7 @@ class IOClient:
         while (2**tick_time)*255 < self.ucmm_timeout:
             tick_time += 1
 
-        cm = CIPObject(self.ucc, 6)
+        cm = CIPObject(UnconnectedClient(self.session), 6)
 
         if self.o2t_size <= 511 and self.t2o_size <= 511:
             o2t_conn_params = ConnMng.NetworkConnectionParameters(
@@ -337,7 +341,10 @@ class IOClient:
         while (2**tick_time)*255 < self.ucmm_timeout:
             tick_time += 1
 
-        cm = CIPObject(self.ucc, 6)
+        if not self.session.handle:
+            self.session.open()
+
+        cm = CIPObject(UnconnectedClient(self.session), 6)
         cm.forward_close(tick_time,
                          self.ucmm_timeout//(2**tick_time),
                          self.connection_serial_number,
@@ -349,6 +356,7 @@ class IOClient:
         self.cip_producer_connection_id = None
         self.cip_consumer_connection_id = None
         self.isconnected = False
+        self.session.close()
 
     @property
     def connection_triad(self):

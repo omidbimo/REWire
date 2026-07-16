@@ -47,7 +47,7 @@ class UCMMPacket(Packet):
 
 
 class UnconnectedClient(ExplicitTransport):
-    def __init__(self, session):
+    def __init__(self, session: eip_encap.EncapSession):
         super(UnconnectedClient, self).__init__()
         self.session = session
 
@@ -77,10 +77,9 @@ class UnconnectedClient(ExplicitTransport):
     def cip_service_send_request(self, service_id, class_id, instance_id,
             attribute_id, data=b'', ekey: ELECTRONIC_KEY_SEGMENT=None):
 
-        if self.session:
+        if not self.session.handle:
             self.session.open()
-        else:
-            raise Exception("Unconnected Client instance is not valid anymore!")
+
         mr_req = MessageRouterRequest(service=service_id)
         if ekey is not None:
             mr_req.request_path += ekey
@@ -102,10 +101,10 @@ class UnconnectedClient(ExplicitTransport):
                                 )
 
     def cip_service_rcv_response(self, service_id, timeout=3000):
-        """
 
-        Note: If there are any SocketAddress items in the response,
-        """
+        if not self.session.peer_ip:
+            raise Exception("No Session available for communication! Call UnconnectedClient's session.open() to establish a new session.")
+
         rsp, _ = eip_encap.rcv_rr_data(self.session.socket, self.session.seq_number, timeout)
         rsp_cpf = CPF.unpack(rsp)
 

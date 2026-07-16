@@ -112,7 +112,7 @@ class RW_TCPSocket(RWSocket):
     def connect(self) -> None:
         try:
             peer = self._socket.getpeername()
-        except:
+        except Exception:
             self._socket.connect(self._server_address)
 
     def send(self, payload):

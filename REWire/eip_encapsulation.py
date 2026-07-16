@@ -245,7 +245,7 @@ class EncapSession():
             self.socket._sessions.append(self)
 
     def close(self):
-        if self.peer_ip:
+        if self.handle is not None:
             if not self._owners:
                 try:
                     unregister_session(self.socket, self.handle)

@@ -88,7 +88,7 @@ class ConnectionTriad:
 class ConnectedClient(ExplicitTransport):
 
     def __init__(self,
-            session,
+            session: eip_encap.EncapSession,
             o2t_rpi = 1500000, # uSec resolution 1500x4 -> 6 sec
             t2o_rpi = 1500000, # uSec resolution 1500x4 -> 6 sec
             timeout_multiplier = 0, # 4x RPI: connection timeout
@@ -147,8 +147,7 @@ class ConnectedClient(ExplicitTransport):
         connection_path += CLASS_ID_SEGMENT(CIPObjectId.MESSAGE_ROUTER)
         connection_path += INSTANCE_ID_SEGMENT(1)
 
-        ucc = UnconnectedClient(self.session)
-        cm = CIPObject(ucc, 6)
+        cm = CIPObject(UnconnectedClient(self.session), 6)
 
         o2t_conn_params = NetworkConnectionParameters(
             connection_size = self.o2t_size,
@@ -230,8 +229,7 @@ class ConnectedClient(ExplicitTransport):
         while (2**tick_time)*255 < self.ucmm_timeout:
             tick_time += 1
 
-        ucc = UnconnectedClient(self.session)
-        cm = CIPObject(ucc, 6)
+        cm = CIPObject(UnconnectedClient(self.session), 6)
 
         cm.forward_close(tick_time,
                          self.ucmm_timeout//(2**tick_time),
@@ -254,8 +252,8 @@ class ConnectedClient(ExplicitTransport):
 
         req_pdu = Class3PDU(self.seq_counter, req.pack())
 
-        if self.session.handle is None:
-            raise Exception("No active session to send the connection request!")
+        if not self.session.handle:
+            self.session.open()
 
         req_explicit = ExplicitConnectedPacket(
                 address_item=ConnectedAddressItem(connection_identifier=self.cip_producer_connection_id),

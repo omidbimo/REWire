@@ -33,6 +33,7 @@ __all__ = [
     "INSTANCE_ID_SEGMENT",
     "ATTRIBUTE_ID_SEGMENT",
     "MEMBER_ID_SEGMENT",
+    "CONNECTION_POINT_SEGMENT",
     "ELECTRONIC_KEY_SEGMENT",
     "ELECTRONIC_KEY_4",
     "ELECTRONIC_KEY_5",
@@ -869,7 +870,7 @@ class INSTANCE_ID_SEGMENT(LOGICAL_SEGMENT):
             else:
                 raise Exception(f"Value larger than 32-bit! {value}")
 
-        super(INSTANCE_ID_SEGMENT, self).__init__(value, LOGICAL_SEGMENT.TYPE_INSTANCE_ID, logical_format)
+        super().__init__(value, LOGICAL_SEGMENT.TYPE_INSTANCE_ID, logical_format)
 
     @classmethod
     def dissect(cls, bstream, padded=False):
@@ -878,7 +879,7 @@ class INSTANCE_ID_SEGMENT(LOGICAL_SEGMENT):
         if logical_type != cls.TYPE_INSTANCE_ID:
             raise Exception(f"Unexpected segment type {logical_type} when unpacking {cls.__name__}!")
 
-        return super(INSTANCE_ID_SEGMENT, cls).dissect(bstream, padded)
+        return super().dissect(bstream, padded)
 
     def __repr__(self):
         return f"{self.__class__.__name__}(value=0x{self.value:01X}, logical_format=0x{(self.type_format & LOGICAL_SEGMENT.LOGICAL_FORMAT_MASK):01X})"
@@ -896,7 +897,7 @@ class ATTRIBUTE_ID_SEGMENT(LOGICAL_SEGMENT):
             else:
                 raise Exception(f"Value larger than 32-bit! {value}")
 
-        super(ATTRIBUTE_ID_SEGMENT, self).__init__(value, LOGICAL_SEGMENT.TYPE_ATTRIBUTE_ID, logical_format)
+        super().__init__(value, LOGICAL_SEGMENT.TYPE_ATTRIBUTE_ID, logical_format)
 
     @classmethod
     def dissect(cls, bstream, padded=False):
@@ -905,7 +906,7 @@ class ATTRIBUTE_ID_SEGMENT(LOGICAL_SEGMENT):
         if logical_type != cls.TYPE_ATTRIBUTE_ID:
             raise Exception(f"Unexpected segment type {logical_type} when unpacking {cls.__name__}!")
 
-        return super(ATTRIBUTE_ID_SEGMENT, cls).dissect(bstream, padded)
+        return super().dissect(bstream, padded)
 
     def __repr__(self):
         return f"{self.__class__.__name__}(value=0x{self.value:01X}, logical_format=0x{(self.type_format & LOGICAL_SEGMENT.LOGICAL_FORMAT_MASK):01X})"
@@ -923,7 +924,7 @@ class MEMBER_ID_SEGMENT(LOGICAL_SEGMENT):
             else:
                 raise Exception("Value larger than 32-bit! {}".format(value))
 
-        super(MEMBER_ID_SEGMENT, self).__init__(value, LOGICAL_SEGMENT.TYPE_MEMBER_ID, logical_format)
+        super().__init__(value, LOGICAL_SEGMENT.TYPE_MEMBER_ID, logical_format)
 
     @classmethod
     def dissect(cls, bstream, padded=False):
@@ -932,7 +933,7 @@ class MEMBER_ID_SEGMENT(LOGICAL_SEGMENT):
         if logical_type != cls.TYPE_MEMBER_ID:
             raise Exception("Unexpected segment type {} when unpacking {}!".format(logical_type, cls.__name__))
 
-        return super(MEMBER_ID_SEGMENT, cls).dissect(bstream, padded)
+        return super().dissect(bstream, padded)
 
     def __repr__(self):
         return f"{self.__class__.__name__}(value=0x{self.value:01X}, logical_format=0x{(self.type_format & LOGICAL_SEGMENT.LOGICAL_FORMAT_MASK):01X})"
@@ -950,7 +951,7 @@ class CONNECTION_POINT_SEGMENT(LOGICAL_SEGMENT):
             else:
                 raise Exception("Value larger than 32-bit! {}".format(value))
 
-        super(CONNECTION_POINT_SEGMENT, self).__init__(value, LOGICAL_SEGMENT.TYPE_CONNECTION_POINT, logical_format)
+        super().__init__(value, LOGICAL_SEGMENT.TYPE_CONNECTION_POINT, logical_format)
 
     @classmethod
     def dissect(cls, bstream, padded=False):
@@ -959,7 +960,7 @@ class CONNECTION_POINT_SEGMENT(LOGICAL_SEGMENT):
         if logical_type != cls.TYPE_CONNECTION_POINT:
             raise Exception("Unexpected segment type {} when unpacking {}!".format(logical_type, cls.__name__))
 
-        return super(CONNECTION_POINT_SEGMENT, cls).dissect(bstream, padded)
+        return super().dissect(bstream, padded)
 
     def __repr__(self):
         return f"{self.__class__.__name__}(value=0x{self.value:01X}, logical_format=0x{(self.type_format & LOGICAL_SEGMENT.LOGICAL_FORMAT_MASK):01X})"

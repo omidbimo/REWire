@@ -93,7 +93,7 @@ def unconnected_messaging_demo(host_ip, server_ip):
     # Calling it explicitly is also safe.
     ucc.session.open()
 
-    print(f"Setting TCP/IP interface object instance attribute 13(Inactivity timer)...")
+    print("Setting TCP/IP interface object instance attribute 13(Inactivity timer)...")
     try:
         ucc.set_attribute_single(CIPObjectId.TCPIP_INTERFACE, 1, 13, data=bytes([120, 0]))
     except CIPError as ex:

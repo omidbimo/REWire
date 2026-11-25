@@ -2,8 +2,11 @@ import logging
 logging.basicConfig(level=logging.INFO,
     format="%(asctime)s - %(levelname)-8s <%(name)s> %(message)s")
 
+from OpenSSL import SSL
+
 from REWire import (
     TCP,
+    TLS,
     CIPError,
     EncapSession,
     ConnectedClient,
@@ -29,6 +32,7 @@ def connected_messaging_demo(host_ip, server_ip):
         - set_attribute_single: Write a single attribute to a device.
         - get_attributes_all: Read multiple attributes of an object from a device.
     """
+    print("*** Class3 Connection ***")
     # ConnectedClient requires a session to establish the connection
     cc = ConnectedClient(EncapSession.from_addr(host_ip, server_ip))
     # Calling open() will open the connection by sending a ForwardOpen request to the server
@@ -87,29 +91,22 @@ def connected_messaging_demo(host_ip, server_ip):
         print(ex)
     cc.close()
 
-    # Secure communication is also possible when the server supports CIP security
+    # Use TLS with the library defaults for devices that support CIP Security.
+    # The default configuration does not verify the server certificate.
+    print("\n*** Secure Class3 Connection ***")
     try:
-        # By setting the security parameter to True, a default security configuration will be used
-        # to communicate with the server
-        sock = TCP(host_ip, server_ip, security=True)
-        session = EncapSession(sock)
-        # Alternative way to create a new EncapSession:
-        # session = EncapSession.from_addr(host_ip, server_ip, security=True)
-        cc_sec = ConnectedClient(session)
-        # When calling open() a secure socket will first perform a TLS handshake then sends the ForwardOpen request
+        cc_sec = ConnectedClient(EncapSession(TLS(host_ip, server_ip)))
         cc_sec.open()
-
-        print("  Device type:", cc_sec.get_attribute_single(CIPObjectId.IDENTITY, 1, 2, rsp_dt=UINT))
-        print("  Product Name:", cc_sec.get_attribute_single(CIPObjectId.IDENTITY, 1, 7, rsp_dt=SHORT_STRING))
-
-        # Calling close() will send the ForwardClose then conditionally closes the underlying session and TCP
-        # socket and a TLS close notification at the end.
+    except (OSError, SSL.Error) as ex:
+        print(f"  Skipping TLS messaging for {server_ip}: {ex}")
+    else:
+        print("  device type:", cc_sec.get_attribute_single(CIPObjectId.IDENTITY, 1, 2, rsp_dt=UINT))
+        print("  product name:", cc_sec.get_attribute_single(CIPObjectId.IDENTITY, 1, 7, rsp_dt=SHORT_STRING))
         cc_sec.close()
-    except Exception as ex:
-        print(ex)
+
 
 
 if __name__ == "__main__":
-    host_ip = "192.168.210.100"
-    server_ip = "192.168.210.10"
+    host_ip = "192.168.210.102"
+    server_ip = "192.168.210.139"
     connected_messaging_demo(host_ip, server_ip)

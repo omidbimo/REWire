@@ -3,8 +3,11 @@ logging.basicConfig(level=logging.INFO,
     format="%(asctime)s - %(levelname)-8s <%(name)s> %(message)s")
 
 
+from OpenSSL import SSL
+
 from REWire import (
     TCP,
+    TLS,
     CIPError,
     EncapSession,
     UnconnectedClient,
@@ -70,22 +73,18 @@ def unconnected_messaging_demo(host_ip, server_ip):
 
     ucc.close()
 
-    # Secure communication is possible when the server supports CIP security
+    # Use TLS with the library defaults for devices that support CIP Security.
+    # The default configuration does not verify the server certificate.
     try:
-        # By setting the security parameter to True, a default security configuration will be used
-        # to communicate with the server
-        sock = TCP(host_ip, server_ip, security=True)
-        ucc_sec = UnconnectedClient(EncapSession(sock))
-
-        print("  Device type:", ucc_sec.get_attribute_single(CIPObjectId.IDENTITY, 1, 2, rsp_dt=UINT))
-        print("  Product Name:", ucc_sec.get_attribute_single(CIPObjectId.IDENTITY, 1, 7, rsp_dt=SHORT_STRING))
-
-        ucc_sec.session.close()
-
-    except CIPError as ex:
-        print(ex)
-    except Exception:
-        pass
+        sec_session = EncapSession(TLS(host_ip, server_ip))
+        sec_session.open()
+    except (OSError, SSL.Error) as ex:
+        print(f"  Skipping TLS messaging for {server_ip}: {ex}")
+    else:
+        ucc_sec = UnconnectedClient(sec_session)
+        print("  TLS device type:", ucc_sec.get_attribute_single(CIPObjectId.IDENTITY, 1, 2, rsp_dt=UINT))
+        print("  TLS product name:", ucc_sec.get_attribute_single(CIPObjectId.IDENTITY, 1, 7, rsp_dt=SHORT_STRING))
+        ucc_sec.close()
 
     # Using other services provided by the UnconnectedClient
     ucc = UnconnectedClient(EncapSession.from_addr(host_ip, server_ip))
@@ -117,6 +116,6 @@ def unconnected_messaging_demo(host_ip, server_ip):
     ucc.close()
 
 if __name__ == "__main__":
-    host_ip = "192.168.210.100"
-    server_ip = "192.168.210.10"
+    host_ip = "192.168.210.102"
+    server_ip = "192.168.210.139"
     unconnected_messaging_demo(host_ip, server_ip)

@@ -1,7 +1,7 @@
 __license__ = "MIT"
 __version__ = "0.1.0"
 
-from .rw_socket import TCP, UDP
+from .rw_socket import DTLS, SOL_SECURITY, TLS, TCP, UDP, SecurityOption
 from .eip_encapsulation import EncapSession, list_services, list_identity, list_interfaces
 from .connected_client import ConnectedClient
 from .unconnected_client import UnconnectedClient
@@ -11,6 +11,10 @@ from .common import CIPObjectId, CIPGeneralStatus, CIPServiceId
 
 __all__ = [ "TCP",
             "UDP",
+            "TLS",
+            "DTLS",
+            "SOL_SECURITY",
+            "SecurityOption",
             "EncapSession",
             "EncapsulationError",
             "CIPError",

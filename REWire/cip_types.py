@@ -476,7 +476,10 @@ class BYTES(bytearray):
                 value = value.to_bytes(length, byteorder="little")
         elif length is not None:
             value = value[:length]
-        super().__init__(value)
+        if isinstance(value, str):
+            super().__init__(value, encoding='ascii')
+        else:
+            super().__init__(value)
 
     def pack(self):
         return self
@@ -564,7 +567,7 @@ class SHORT_STRING(str):
         return super().__new__(cls, value)
 
     def pack(self):
-        return USINT(len(self)).pack() + self
+        return USINT(len(self)).pack() + bytearray(self, encoding="ascii")
 
     @classmethod
     def unpack(cls, bstream, error_on_excess=True):
